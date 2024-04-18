@@ -3,8 +3,8 @@
 
 **/.idea/
 **/.__pycache__/
+**/.ipynb_checkpoints/
 
 Dockerfile
 
 .dockerignore
-.gitignore
