@@ -1,0 +1,107 @@
+.area_green {
+    /* Hier kannst du die Stile für die Zellen mit der Klasse "area_th" definieren */
+    background-color: rgba(78, 166, 72, 0.19);
+}
+.area_red {
+    /* Hier kannst du die Stile für die Zellen mit der Klasse "area_th" definieren */
+    background-color: rgba(166, 72, 105, 0.19);
+}
+
+
+.slider-container {
+    display: flex;
+    align-items: center; /* Vertikal zentrieren */
+}
+
+.slider_label {
+    min-width: 40px;
+    margin-left: 4px;
+    margin-bottom: 4px;
+}
+
+.slider-input {
+    min-width: 86px;
+    max-width: 86px;
+    margin-bottom: 4px;
+}
+
+
+.slider {
+  -webkit-appearance: none;
+  min-width: 600px;
+  width: 600px;
+  height: 8px;
+  border-radius: 5px;
+  background: #d3d3d3;
+
+  margin-right: 8px;
+  margin-left: 8px;
+  margin-bottom: 4px;
+
+
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider_start1::-webkit-slider-thumb {
+  background: #0B610B;
+}
+
+.slider_start1::-moz-range-thumb {
+  background: #0B610B;
+}
+
+.slider_end1::-webkit-slider-thumb {
+  background: #31B404;
+}
+
+.slider_end1::-moz-range-thumb {
+  background: #31B404;
+}
+
+
+.slider_start2::-webkit-slider-thumb {
+  background: #8A2908;
+}
+
+.slider_start2::-moz-range-thumb {
+  background: #8A2908;
+}
+
+.slider_end2::-webkit-slider-thumb {
+  background: #DF7401;
+}
+
+.slider_end2::-moz-range-thumb {
+  background: #DF7401;
+}
+
+.slider_start3::-webkit-slider-thumb {
+  background: #151515;
+}
+
+.slider_start3::-moz-range-thumb {
+  background: #151515;
+}
+
+.slider_end3::-webkit-slider-thumb {
+  background: #6E6E6E;
+}
+
+.slider_end3::-moz-range-thumb {
+  background: #6E6E6E;
+}

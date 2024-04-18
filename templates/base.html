@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSC Analyzer</title>
+    
+    <!-- Material Design Light (Google) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='mdl/material.min.css') }}">
+    <script src="{{ url_for('static', filename='mdl/material.min.js') }}"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    {% block head %}{% endblock head %}
+</head>
+
+<body>
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">{% block title %}{% endblock title %}</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                <nav class="mdl-navigation mdl-layout--large-screen-only">
+                    {% block large_navigation %}{% endblock large_navigation %}
+                </nav>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Menu</span>
+            <nav class="mdl-navigation">
+                {% block side_navigation %}{% endblock side_navigation %}
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                {% block content %}
+                <!-- Hier wird der Hauptinhalt eingefügt -->
+                {% endblock content %}
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

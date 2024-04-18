@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.0.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.0.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.0.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.0.1.min.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/plot.css') }}?v=1">
+
+
+{% endblock head %}
+{% block title %}{{ sample }} - Segment {{ segment }}{% endblock title %}
+
+{% block large_navigation %}
+    {% if previous_sample %}
+        <a class="mdl-navigation__link" href="{{ url_for('sample_segment_view', sample=previous_sample, segment=previous_segment) }}">Previous</a>
+    {% endif %}
+    {% if next_sample %}
+    <a class="mdl-navigation__link" href="{{ url_for('sample_segment_view', sample=next_sample, segment=next_segment) }}">Next</a>
+    {% endif %}
+{% endblock large_navigation %}
+
+{% block side_navigation %}
+    <a class="mdl-navigation__link" href="">Link</a>
+{% endblock side_navigation %}
+
+{% block content %}
+<div class="container" style="margin: 10px;">
+  <div class="row ">
+    <div class="col" style="min-width: 750px; margin-right: 12px;">
+        <form id="pointForm" method="post" >
+              {% for num in peakCount|loop %}
+                  <p style="margin-bottom: 2px;"><b>Peak {{ num }}</b></p>
+                  <div class="slider-container">
+                    <label class="slider_label" for="slider_start{{ num }}">Start:</label>
+                    <input class ="slider slider_start{{ num }}" type="range" id="slider_start_{{ num }}" name="sliderstart_{{ num }}" value="100" min="-50" max="300" step="0.00001" oninput="updatePoint(false, this.id)" onmouseup="updatePoint(true, this.id)">
+                    <input class="slider-input" type="number" id="slider_start_{{ num }}_text" name = "start_{{ num }}" step="0.1" min="-50" max="300" onchange="updateSlider('slider_start_{{ num }}');">
+                </div>
+                <div class="slider-container">
+                    <label class="slider_label" for="slider_end_{{ num }}">Ende:</label>
+                    <input class ="slider slider_end{{ num }}" type="range" id="slider_end_{{ num }}" name="sliderend_{{ num }}" value="100" min="-50" max="300" step="0.00001" oninput="updatePoint(false, this.id)" onmouseup="updatePoint(true, this.id)">
+                    <input class="slider-input" type="number" id="slider_end_{{ num }}_text" name = "end_{{ num }}" step="0.1" min="-50" max="300" onchange="updateSlider('slider_end_{{ num }}');">
+                </div>
+              {% endfor %}
+                <input type="hidden" name="jsonPeak" id="jsonPeak"><!-- Wird im POST übergeben! -->
+                <input type="hidden" name="action" value="plot_edit"><!-- zur Identifizierung des POSTs  -->
+        </form>
+        <div id="plot"></div>
+    </div>
+    <div class="col" style="min-width: 320px;max-width: 750px;">
+        <table class="table table-bordered table-hover" id="peakTable" style="margin-top: 25px; width: 100%">
+            <thead>
+                <tr>
+                    <th>Peak</th>
+                    <th>Peak Temperature</th>
+                    <th>Area</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+
+
+<script>
+     var jsonPeak = {{ jsonPeak|safe }};
+     var jsonMeasurement = {{ jsonMeasurement|safe }};
+
+     var peakCount = {{ peakCount|safe }};
+
+     const tableBody = document.querySelector("#peakTable tbody");
+
+</script>
+<script src="{{ url_for('static', filename='script/plot_script.js') }}?v=1.6"></script>
+
+{% endblock content %}
