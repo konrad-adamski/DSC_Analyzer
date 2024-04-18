@@ -1,0 +1,23 @@
+# Local
+- Holen Sie alle Daten aus der Repository
+- Installieren Sie alle nötige Pakete:
+  """bash
+  pip install -r requirements.txt
+  """
+- Starten Sie die Anwendung mit
+    """bash
+    python app.py
+    """
+- über http://127.0.0.1:5000 können Sie auf die App zugreifen
+- Über http://127.0.0.1:5000/plot/C1/S5 können Sie auf dem Beispieldatensatz zugreifen
+
+# Docker
+- Laden Sie die docker-compose.yml herunter
+- Im gleichen Ordner erstellen Sie einen Daten-Ordner und legen dort "measurement.csv" & "peak.csv" ab. Die Daten liegen im "data"-Ordner in der Repository.
+- Passen Sie <your_data_folder> durch ihren Daten-Ordner Namen an
+- Führen Sie:
+    """"bash 
+    docker-compose up
+    """"
+- über http://127.0.0.1:8000 können Sie auf die App zugreifen
+- Über http://127.0.0.1:8000/plot/C1/S5 können Sie auf dem Beispieldatensatz zugreifen
