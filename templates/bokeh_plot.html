@@ -18,10 +18,10 @@
 
 {% block large_navigation %}
     {% if previous_sample %}
-        <a class="mdl-navigation__link" href="{{ url_for('sample_segment_view', sample=previous_sample, segment=previous_segment) }}">Previous</a>
+        <a class="mdl-navigation__link" href="{{ url_for('peak.sample_segment_view', project_id = project_id, sample=previous_sample, segment=previous_segment) }}">Previous</a>
     {% endif %}
     {% if next_sample %}
-    <a class="mdl-navigation__link" href="{{ url_for('sample_segment_view', sample=next_sample, segment=next_segment) }}">Next</a>
+    <a class="mdl-navigation__link" href="{{ url_for('peak.sample_segment_view', project_id = project_id, sample=next_sample, segment=next_segment) }}">Next</a>
     {% endif %}
 {% endblock large_navigation %}
 

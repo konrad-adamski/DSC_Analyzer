@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Project</title>
+</head>
+<body>
+    <h1>Create a New Project</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div>
+            <label for="name">Project Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter project name">
+        </div>
+        <div>
+            <label for="ascii_file">ASCII File:</label>
+            <input type="file" id="ascii_file" name="ascii_file" accept=".txt">
+        </div>
+        <div>
+            <button type="submit">Create Project</button>
+        </div>
+    </form>
+</body>
+</html>

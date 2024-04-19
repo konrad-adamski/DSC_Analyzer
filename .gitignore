@@ -6,6 +6,8 @@
 **/.ipynb_checkpoints/
 DSC Notebooks/.ipynb_checkpoints
 
-Dockerfile
+data/uploads
+instance/
 
+Dockerfile
 .dockerignore
