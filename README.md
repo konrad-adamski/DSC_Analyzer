@@ -1,4 +1,4 @@
-# Local
+# Lokal
 - Holen Sie alle Daten aus der Repository.
 - Installieren Sie alle nötige Pakete: "pip install -r requirements.txt"
 - Starten Sie die Anwendung mit "python app.py"
