@@ -1,24 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Project</title>
-</head>
-<body>
-    <h1>Create a New Project</h1>
-    <form method="post" enctype="multipart/form-data">
-        <div>
-            <label for="name">Project Name:</label>
-            <input type="text" id="name" name="name" placeholder="Enter project name">
+{% extends 'base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/project_form.css') }}?v=1">
+{% endblock head %}
+
+{% block title %}Create New Project{% endblock title %}
+
+
+{% block large_navigation %}
+    <a class="mdl-navigation__link" href="">Link</a>
+{% endblock large_navigation %}
+
+
+{% block side_navigation %}
+    <a class="mdl-navigation__link" href="">Link</a>
+{% endblock side_navigation %}
+
+
+{% block content %}
+    <div class="mdl-grid">
+        <div class="mdl-cell">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Project Name:</label>
+                    <input type="text" id="name" name="name" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label for="ascii_file">ASCII File:</label>
+                    <input type="file" id="ascii_file" name="ascii_file" accept=".txt" required>
+                </div>
+                <div>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit">Create Project</button>
+                </div>
+            </form>
         </div>
-        <div>
-            <label for="ascii_file">ASCII File:</label>
-            <input type="file" id="ascii_file" name="ascii_file" accept=".txt">
-        </div>
-        <div>
-            <button type="submit">Create Project</button>
-        </div>
-    </form>
-</body>
-</html>
+    </div>
+{% endblock content %}
+
+

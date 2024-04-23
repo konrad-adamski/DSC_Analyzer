@@ -13,8 +13,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Konfigurationen für den Datei-Upload
-app.config['UPLOAD_FOLDER'] = 'data/uploads'  # Stelle sicher, dass dieser Pfad existiert
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Optional: Maximale Dateigröße (z.B. 16 MB)
+app.config['UPLOAD_FOLDER'] = 'data'  # Stelle sicher, dass dieser Pfad existiert
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # Optional: Maximale Dateigröße (z.B. 1 MB)
 
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])

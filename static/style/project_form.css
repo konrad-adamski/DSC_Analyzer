@@ -1,0 +1,31 @@
+.form-group {
+    display: flex;
+    margin-bottom: 10px; /* Abstand zwischen den Elementen */
+    align-items: center; /* Zentriert die Inhalte vertikal */
+}
+
+.form-group label {
+    width: 150px; /* Breite des Labels, um einheitliche Startpunkte zu gewährleisten */
+    margin-right: 10px; /* Abstand zwischen Label und folgendem Element */
+}
+
+.form-group input {
+    min-width: 160px; /* Feste Breite für Input-Felder */
+    max-width: 260px;
+    margin-right: 10px; /* Optionaler Abstand rechts vom Input-Feld */
+}
+
+.form-group a {
+    width: 200px; /* Feste Breite für Input-Felder */
+    margin-right: 10px; /* Optionaler Abstand rechts vom Input-Feld */
+    color: blue;
+}
+.form-group a:hover {
+    color: #6a1e98; /* Farbe beim Darüberfahren mit der Maus */
+}
+
+
+hr {
+    width: 100%;
+    margin-top:20px;
+}

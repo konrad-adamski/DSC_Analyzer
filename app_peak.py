@@ -6,7 +6,6 @@ from utils.calc import get_nearest_value, area_calc
 
 peak_bp = Blueprint('peak', __name__)
 
-
 @peak_bp.route('/')
 def index():
     return "index"
@@ -83,6 +82,11 @@ def sample_segment_view(project_id, sample, segment):
                 df_peak['End_Temperature'] = (df_peak['End_Temperature']
                                               .apply(lambda x: get_nearest_value(x, temperature_list)))
                 area_calc(df_peak, df_measurement, series)  # anhand der neuen Punkte werden die Flächen berechnet
+            elif request.form.get("action") == "table_delete":
+                df_peak.reset_index(drop=True, inplace=True)
+                df_peak.index = df_peak.index + 1
+            elif request.form.get("action") == "table_add":
+                print("TODO Add")
 
         json_peak = df_peak.to_json(orient="index", indent=4)
         print(df_peak)
