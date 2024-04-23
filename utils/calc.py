@@ -1,4 +1,129 @@
+import pandas as pd
 import numpy as np
+from scipy.signal import find_peaks
+
+"""
+this_height = 0.3  # Grenze auf der y-Achse (0-1) 
+this_prominence = 0.01 # [0.001 (mehr peaks) - 0.1 (weniger peaks)]
+"""
+
+
+def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
+    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+
+    for col in list(dframe.columns):
+        data = get_series_peaks_data(dframe, col, this_height, this_prominence)
+
+        if df_peak.empty:
+            df_peak = pd.DataFrame(data)
+        else:
+            df_peak = pd.concat([df_peak, pd.DataFrame(data)], ignore_index=True)
+
+    return df_peak
+
+
+def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
+    if "S3" in series_name:
+        dframe = -dframe
+        # Finden der Peaks
+    peaks, properties = find_peaks(dframe[series_name], height=this_height, prominence=this_prominence, width=1)
+
+    # Berechnung der ersten Ableitung der Daten -----------------------------
+    first_derivative = np.diff(dframe[series_name])
+
+    # Berechnung der zweiten Ableitung
+    second_derivative = np.gradient(first_derivative)
+
+    # Start- und Endpunkte bestimmen ----------------------------------------------------
+
+    # Initialisierung der Listen für die Startpunkte -------------------
+    start_points = []
+
+    # Iteriere durch jeden Peak, um den Startpunkt zu bestimmen
+    for peak_index in range(len(peaks)):
+        peak = peaks[peak_index]
+        # Suche rückwärts nach dem letzten Punkt, bei dem der 1. Ableitung negativ ist
+        start = None
+        for i in range(peak, 0, -1):  # ab peak rückwärts (theoretisch bis Anfang)
+            if first_derivative[i - 1] < 0:
+                start = i
+                break
+        if start is not None:
+            start_points.append(start)
+        else:
+            start_points.append(0)
+
+    # Initialisierung der Listen für die Endpunkte ----------------------
+    end_points = []
+
+    # Iteriere durch jeden Peak, um den Endpunkt zu bestimmen
+    for peak_index in range(len(peaks)):
+        peak = peaks[peak_index]
+        # Suche vorwärts nach dem ersten Punkt, bei dem der 1. Ableitung positiv wird
+        end = None
+        for i in range(peak, len(first_derivative)):  # ab peak vorwärts (theoretisch bis Ende)
+            if first_derivative[i] > 0:
+                end = i + 1  # Berücksichtige np.diff Verschiebung
+                break
+        if end is not None:
+            end_points.append(end)
+        else:
+            end_points.append(len(dframe) - 1)
+
+    # Startpunkte optimieren ----------------------------------------------
+    second_derivative_series = pd.Series(second_derivative)
+
+    # Initialisierung von improved_start_points
+    improved_start_points = []
+
+    for i in range(len(start_points)):
+        this_start = start_points[i]
+        this_peak = peaks[i]
+
+        # Eingrenzung der Series
+        second_der_area = second_derivative_series.loc[range(this_start + 1, this_peak)]
+
+        # Umgekehrte For-Schleife durch die Series UM die negativen Werte "am Peak" zu löschen
+        for index in reversed(second_der_area.index):
+            value = second_der_area[index]
+            if value > 0:
+                break;
+            elif value <= 0:
+                second_der_area = second_der_area.drop(index)
+
+        new_start = this_start
+
+        # Umgekehrte For-Schleife durch die Series
+        # UM den Übergang ins Negative zu finden (mit Toleranz) bzw. erste sehr nach an der 0
+        for index in reversed(second_der_area.index):
+            value = second_der_area[index]
+            new_start = index
+
+            if value <= 0.0001:
+                if dframe[series_name].iloc[index] <= dframe[series_name].iloc[end_points[i]]:
+                    break
+
+        improved_start_points.append(new_start)
+
+    # ---------------------
+    if "S3" in series_name:
+        dframe = -dframe
+
+    peaks_temperature = dframe.index[peaks]
+    # init_start_points_temperature = dframe.index[start_points]
+    start_points_temperature = dframe.index[improved_start_points]
+    end_points_temperature = dframe.index[end_points]
+
+    return {"Series": series_name,
+            'Peak_Temperature': peaks_temperature,
+            'Start_Temperature': start_points_temperature,
+            'End_Temperature': end_points_temperature,
+            'Area': np.NaN}
+
+
+def peak_df_area_calc(peak_dframe, measurement_dframe):
+    for col in list(measurement_dframe.columns):
+        area_calc(peak_dframe, measurement_dframe, col)
 
 
 def area_calc(peak_dframe, measurement_dframe, series_name):

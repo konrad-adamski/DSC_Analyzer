@@ -1,7 +1,7 @@
 import os
 
-from flask import Flask, send_from_directory
-from app_peak import peak_bp
+from flask import Flask, send_from_directory, redirect, url_for
+from app_view import view_bp
 from app_project import project_bp
 from utils.database import init_db
 from utils.template_tag import loop
@@ -21,13 +21,13 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 init_db(app)  # Initialisiert die Datenbank mit der Konfiguration von Flask
 
-app.register_blueprint(project_bp, url_prefix='/project')
-app.register_blueprint(peak_bp, url_prefix='/peak')
+app.register_blueprint(project_bp, url_prefix='')
+app.register_blueprint(view_bp, url_prefix='/view')
 
 
 @app.route('/')
 def hello_world():  # put application's code here
-    return 'Hello World!'
+    return redirect(url_for('project.create_new_project'))
 
 
 # für href="{{ url_for('data', filename='measurement.csv') }}" bzw. Download

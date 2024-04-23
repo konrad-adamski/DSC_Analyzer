@@ -34,7 +34,7 @@ def project_preparation(project_id):
             measurements_df = get_measurement_df(measurements_text, info_df)
             measurements_csv_name = f"p{project.id}_measurements.csv"
             measurements_csv_path = os.path.join(current_app.config['UPLOAD_FOLDER'], measurements_csv_name)
-            measurements_df.to_csv(measurements_csv_path, sep=";", index=False)
+            measurements_df.to_csv(measurements_csv_path, sep=";", index=True)
             project.measurements_csv = measurements_csv_name
 
             # Commit in Database

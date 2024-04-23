@@ -9,7 +9,9 @@
 
 
 {% block large_navigation %}
-    <a class="mdl-navigation__link" href="">Link</a>
+    {% if project.peaks_csv %}
+        <a class="mdl-navigation__link" href="{{ url_for('view.redirect_first', project_id=project.id) }}">Show Peaks</a>
+    {% endif %}
 {% endblock large_navigation %}
 
 
@@ -19,7 +21,7 @@
 
 {% block content %}
     <div class="mdl-grid">
-        <div class="mdl-cell mdl-cell--4-col">
+        <div class="mdl-cell" style="width: 400px;">
             <form id="nameForm" method="post" >
                 <div class="form-group">
                     <label for="project_name">Project Name:</label>
@@ -64,7 +66,7 @@
             <div class="mdl-grid" style="padding-left: 0;">
                  <form id="generatePeaksForm" method="post" >
                      {% if project.peaks_csv %}
-                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="sendGeneratePeaksForm()">Generate Peaks</button>
+                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button" onclick="sendGeneratePeaksForm()">Generate Peaks</button>
                      {% else %}
                          <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit">Generate Peaks</button>
                      {% endif %}
@@ -73,7 +75,7 @@
             </div>
             <div class="mdl-grid" style="padding-left: 0;">
                  <form id="deleteForm" method="post" >
-                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" style="background: darkred;" onclick="sendDeleteForm()">Delete Project</button>
+                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button" style="background: darkred;" onclick="sendDeleteForm()">Delete Project</button>
                      <input type="hidden" name="action" value="delete_project"><!-- zur Identifizierung des POSTs  -->
                  </form>
             </div>

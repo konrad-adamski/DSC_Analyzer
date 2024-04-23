@@ -4,6 +4,7 @@ from flask import Blueprint, redirect, url_for, request, render_template, curren
 from werkzeug.utils import secure_filename
 
 from models import Project
+from utils.calc import get_peak_df, peak_df_area_calc
 from utils.database import db
 import pandas as pd
 
@@ -56,6 +57,16 @@ def project_overview(project_id):
                 delete_project(project_id)
                 return redirect(url_for('hello_world'))
 
+            if request.form.get("action") == "generate_peaks":
+                measurement_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.measurements_csv))
+                df_measurement = pd.read_csv(measurement_csv_path, sep=";", index_col="Temp./°C")
+                df_peak = get_peak_df(df_measurement)
+                peak_df_area_calc(df_peak, df_measurement)
+                peaks_csv_name = f"p{project.id}_peaks.csv"
+                peaks_csv_path = os.path.join(current_app.config['UPLOAD_FOLDER'], peaks_csv_name)
+                df_peak.to_csv(peaks_csv_path, sep=";", index=False)
+                project.peaks_csv = peaks_csv_name
+                db.session.commit()
 
     context["project"] = project
     return render_template('project_overview.html', **context)
