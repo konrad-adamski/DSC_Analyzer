@@ -1,7 +1,20 @@
+import json
+import os
 from datetime import datetime
 from zoneinfo import ZoneInfo  # Importieren der ZoneInfo Klasse
 
 from utils.database import db
+
+
+def load_default_config():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    config_path = os.path.join(dir_path, 'data/config.json')
+    with open(config_path, 'r') as file:
+        data = json.load(file)
+    return data['default']
+
+
+default_config = load_default_config()
 
 
 class Project(db.Model):
@@ -11,6 +24,8 @@ class Project(db.Model):
     info_csv = db.Column(db.String(255), nullable=True)
     measurements_csv = db.Column(db.String(255), nullable=True)
     peaks_csv = db.Column(db.String(255), nullable=True)
+    find_peak_height = db.Column(db.Float, nullable=False, default=default_config['find_peak_height'])
+    find_peak_prominence = db.Column(db.Float, nullable=False, default=default_config['find_peak_prominence'])
     date = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(ZoneInfo("Europe/Berlin")))
 
     def __repr__(self):

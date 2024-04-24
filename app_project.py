@@ -58,10 +58,27 @@ def project_overview(project_id):
                 return redirect(url_for('hello_world'))
 
             if request.form.get("action") == "generate_peaks":
+                find_peak_height = request.form["project_find_peak_height"]
+                find_peak_prominence = request.form["project_find_peak_prominence"]
+
                 measurement_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.measurements_csv))
                 df_measurement = pd.read_csv(measurement_csv_path, sep=";", index_col="Temp./°C")
-                df_peak = get_peak_df(df_measurement)
+
+                # Bestimmung der Peaks
+                if find_peak_height and find_peak_prominence:
+                    df_peak = get_peak_df(df_measurement,
+                                          this_height=float(find_peak_height),
+                                          this_prominence=float(find_peak_prominence))
+                    project.find_peak_height = find_peak_height
+                    project.find_peak_prominence = find_peak_prominence
+                    db.session.commit()
+                else:
+                    df_peak = get_peak_df(df_measurement)
+
+                # Berechnung der Peak-Flächen
                 peak_df_area_calc(df_peak, df_measurement)
+
+                # Speichern
                 peaks_csv_name = f"p{project.id}_peaks.csv"
                 peaks_csv_path = os.path.join(current_app.config['UPLOAD_FOLDER'], peaks_csv_name)
                 df_peak.to_csv(peaks_csv_path, sep=";", index=False)

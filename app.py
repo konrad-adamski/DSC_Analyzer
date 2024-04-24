@@ -4,10 +4,11 @@ from flask import Flask, send_from_directory, redirect, url_for
 from app_view import view_bp
 from app_project import project_bp
 from utils.database import init_db
-from utils.template_tag import loop
+from utils.template_tag import loop, loop_max3
 
 app = Flask(__name__)
 app.jinja_env.filters['loop'] = loop
+app.jinja_env.filters['loop_max3'] = loop_max3
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

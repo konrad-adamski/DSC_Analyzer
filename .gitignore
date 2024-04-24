@@ -1,12 +1,13 @@
 **/env/
 **/venv/
+/env
+/env/
 
 **/.idea/
 **/.__pycache__/
 **/.ipynb_checkpoints/
 DSC Notebooks/.ipynb_checkpoints
 
-data/uploads
 instance/
 
 Dockerfile

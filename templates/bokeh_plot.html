@@ -9,6 +9,7 @@
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.0.1.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style/plot.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/project_form.css') }}?v=1">
 
 
 {% endblock head %}
@@ -33,7 +34,7 @@
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--7-col" style="padding: 5px 2px; width: 760px;">
         <form id="pointForm" method="post" >
-              {% for num in peakCount|loop %}
+              {% for num in peakCount|loop_max3 %}
                   <p style="margin-bottom: 2px;"><b>Peak {{ num }}</b></p>
                   <div class="slider-container">
                     <label class="slider_label" for="slider_start{{ num }}">Start:</label>
@@ -74,16 +75,41 @@
             <div class="mdl-cell" style="flex-grow: 1; width: auto;">
                 <form id="tableAddForm" method="post">
                     {% if peakCount < 3 %}
-                        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" style="float: right;" onclick="tableAddPeak()">
+                        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" style="float: right;" type="button" onclick="openModal()">
                             <i class="material-icons">add</i>
                         </button>
                     {% else %}
-                        <button class="mdl-button mdl-js-button mdl-button--fab" style="float: right;" onclick="tableAddPeak()" disabled>
+                        <button class="mdl-button mdl-js-button mdl-button--fab" style="float: right;" type="button" disabled>
                             <i class="material-icons">add</i>
                         </button>
                     {% endif %}
                      <input type="hidden" id="jsonPeak_table_add" name="jsonPeak">
                     <input type="hidden" name="action" value="table_add">
+                    <!-- Modal Popup für die Eingaben -->
+                    <div id="myModal" style="display:none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+                        <div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 720px;">
+                            <h3><u>New Peak</u></h3>
+                            <h4>search range</h4>
+                            <div class="mdl-grid">
+                                <div class="mdl-cell mdl-cell--6-col form-group" style="flex-grow: 1; width: auto;">
+                                    <label for="min_temperature">Start Temperature:</label>
+                                    <input type="number" id="min_temperature" step="0.1" min="-50" max="300" name="min_temperature">
+                                </div>
+                                <div class="mdl-cell mdl-cell--6-col form-group" style="flex-grow: 1; width: auto;">
+                                    <label for="max_temperature">End Temperature:</label>
+                                    <input type="number" id="max_temperature" step="0.1" min="-50" max="300" name="max_temperature">
+                                </div>
+                            </div>
+                            <div class="mdl-grid">
+                                <div class="mdl-cell mdl-cell--6-col" style="flex-grow: 1; width: auto;">
+                                    <button type="button" onclick="closeModal()">Cancel</button>
+                                </div>
+                                <div class="mdl-cell mdl-cell--6-col" style="flex-grow: 1; width: auto;">
+                                    <button type="button" style="float: right;" onclick="tableAddPeak()">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

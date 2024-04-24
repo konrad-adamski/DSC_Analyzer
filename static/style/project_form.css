@@ -5,8 +5,8 @@
 }
 
 .form-group label {
-    width: 150px; /* Breite des Labels, um einheitliche Startpunkte zu gewährleisten */
-    margin-right: 10px; /* Abstand zwischen Label und folgendem Element */
+    width: 130px; /* Breite des Labels, um einheitliche Startpunkte zu gewährleisten */
+    margin-right: 4px; /* Abstand zwischen Label und folgendem Element */
 }
 
 .form-group input {
@@ -27,5 +27,5 @@
 
 hr {
     width: 100%;
-    margin-top:20px;
+    margin: 20px 0;
 }

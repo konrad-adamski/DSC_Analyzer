@@ -23,6 +23,7 @@ def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
 
 
 def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
+    print("HHHHHHHHHHHHHHAAAAAAAAAALLLLLLLLLLO")
     if "S3" in series_name:
         dframe = -dframe
         # Finden der Peaks
@@ -80,15 +81,22 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
         this_start = start_points[i]
         this_peak = peaks[i]
 
+        print("dgdghadjaskdasjkdhasjkdhasjkdhasjkhdka")
+
         # Eingrenzung der Series
-        second_der_area = second_derivative_series.loc[range(this_start + 1, this_peak)]
+
+        if len(list(range(this_start, this_peak))) >= 3:  # Start mind. drei Indexpunkte entfernt vom Peak (Problem beim 3. Peak)
+            second_der_area = second_derivative_series.loc[range(this_start, this_peak)]
+        else:
+            second_der_area = second_derivative_series.loc[range(this_start-25, this_peak)]
+        print(this_start, this_peak)
 
         # Umgekehrte For-Schleife durch die Series UM die negativen Werte "am Peak" zu löschen
         for index in reversed(second_der_area.index):
             value = second_der_area[index]
-            if value > 0:
-                break;
-            elif value <= 0:
+            if value > 0.0001:
+                break
+            else:
                 second_der_area = second_der_area.drop(index)
 
         new_start = this_start
@@ -100,7 +108,7 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
             new_start = index
 
             if value <= 0.0001:
-                if dframe[series_name].iloc[index] <= dframe[series_name].iloc[end_points[i]]:
+                if dframe[series_name].iloc[index] < dframe[series_name].iloc[end_points[i]]:
                     break
 
         improved_start_points.append(new_start)

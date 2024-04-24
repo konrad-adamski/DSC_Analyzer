@@ -1,7 +1,7 @@
 jsonMeasurement.y = jsonMeasurement.y.map(yWert => (yWert+1) * 100000);
 getRowTable(jsonPeak, "area_green");
 
-for (let i = 1; i <= peakCount; i++) {
+for (let i = 1; i <= Math.min(peakCount, 3); i++) {
     let slider_start = document.getElementById("slider_start_" + i);
     let slider_end = document.getElementById("slider_end_" + i);
 
@@ -76,18 +76,27 @@ var source3 = new Bokeh.ColumnDataSource({
 
 
 if (source1.data["x"].length > 0) {
-    var point1 = plot.circle({field: "x"}, {field: "y"}, {source: source1, size: 10, color: ["#0B610B", "#31B404"]});
+    plot.circle({field: "x"}, {field: "y"}, {source: source1, size: 10, color: ["#0B610B", "#31B404"]});
     plot.line({field: "x"}, {field: "y"}, {source: source1, line_width:2, line_color:"#088A08"});
 }
 
 if (source2.data["x"].length > 0) {
-    var point2 = plot.circle({field: "x"}, {field: "y"}, {source: source2, size: 10, color: ["#8A2908", "#DF7401"]});
+    plot.circle({field: "x"}, {field: "y"}, {source: source2, size: 10, color: ["#8A2908", "#DF7401"]});
     plot.line({field: "x"}, {field: "y"}, {source: source2, line_width:2, line_color:"#B45F04"});
 }
 if (source3.data["x"].length > 0) {
     plot.circle({field: "x"}, {field: "y"}, {source: source3, size: 10, color: ["#151515", "#6E6E6E"]});
     plot.line({field: "x"}, {field: "y"}, {source: source3, line_width:2, line_color:"#424242"});
 }
+
+
+// Durchlaufen des jsonPeak-Objekts
+for (let key in jsonPeak) {
+    let peakTemperature = jsonPeak[key]["Peak_Temperature"];
+    let peak_y = getNearestY(peakTemperature, jsonMeasurement)
+    plot.x([peakTemperature], [peak_y], { size: 10, color: '#3399ff', line_width: 2});
+}
+
 
 // Definieren der Tooltip-Nachrichts
 var tooltip_x = [
@@ -167,7 +176,18 @@ function tableDeletePeaks() {
     document.getElementById('tableDeleteForm').submit();
 }
 
+
+function openModal() {
+    document.getElementById('myModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('myModal').style.display = 'none';
+}
+
+
 function tableAddPeak() {
+    closeModal();
     // Setzen des JSON-Strings in das versteckte Eingabefeld
     document.getElementById('jsonPeak_table_add').value = JSON.stringify(jsonPeak);
 
