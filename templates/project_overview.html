@@ -2,6 +2,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='style/project_form.css') }}?v=1">
+
 {% endblock head %}
 
 
@@ -68,10 +69,15 @@
                      <div class="form-group">
                         <label for="find_peak_height">Peak Search Height:</label>
                         <input class="mdl-js-textfield" type="number" id="find_peak_height" name="project_find_peak_height" min="0" max="1" step="0.01" value="{{ project.find_peak_height}}">
-                    </div>
+                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" type="button" id="peak_height_info" onmouseover="get_bubble(this.id, true, 'height')"  onmouseout="get_bubble(this.id, false)">?</button>
+                        <div id="peak_height_info_bubble" style="display: none; position: absolute; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>
+                     </div>
                     <div class="form-group">
                         <label for="find_peak_prominence">Peak Prominence:</label>
                         <input class="mdl-js-textfield" type="number" id="find_peak_prominence" name="project_find_peak_prominence" min="0" max="1" step="0.001" value="{{ project.find_peak_prominence}}">
+                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" type="button" id="peak_prominence_info" onmouseover="get_bubble(this.id, true, 'prominence')"  onmouseout="get_bubble(this.id, false)">?</button>
+                        <div id="peak_prominence_info_bubble" style="display: none; position: absolute; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>
+
                     </div>
 
                      {% if project.peaks_csv %}
@@ -111,6 +117,37 @@
         document.getElementById('deleteForm').submit();
         }
     }
+
+    let prominence = "lorem ipsum"
+
+
+    function get_bubble(buttonId, show, type) {
+        let button = document.getElementById(buttonId);
+        let bubble = document.getElementById(buttonId+'_bubble');
+        let buttonRect = button.getBoundingClientRect(); // Hole die Position und Größe des Buttons
+
+        if (show) {
+            if (type === "prominence") {
+                // Setzen des Inhalts der Informationsblase, wenn sie angezeigt werden soll
+                bubble.innerHTML = 'Info zur Prominence';
+            } else if (type === "height") {
+                bubble.innerHTML = 'Info zur Height';
+            } else {
+                bubble.innerHTML = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+            }
+            // Positionieren Sie die Blase rechts neben dem Button
+            bubble.style.left = (buttonRect.right + 6) + 'px'; // 6px rechts vom Button
+            bubble.style.top= (buttonRect.top - 90) + 'px';
+            bubble.style.display = 'block'; // Blase anzeigen
+        } else {
+            // Blase ausblenden und Inhalt leeren
+            bubble.style.display = 'none';
+            bubble.innerHTML = '';
+        }
+    }
+
+
+
 
     </script>
 {% endblock content %}

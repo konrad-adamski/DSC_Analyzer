@@ -98,22 +98,21 @@ def sample_segment_view(project_id, sample, segment):
                         min_temperature = get_nearest_value(min_temperature, temperature_list)
                         max_temperature = get_nearest_value(max_temperature, temperature_list)
 
-                        #print(df_measurement.loc[min_temperature:max_temperature, series])
-                        print(df_measurement.loc[min_temperature:max_temperature])
-                        print("______________________________________________________________________________")
-
                         df_peak_new = get_peak_df(df_measurement.loc[min_temperature:max_temperature, [series]],
                                                   this_height=0, this_prominence=0.0001)
 
                         peak_df_area_calc(df_peak_new, df_measurement)
-
                         df_peak = pd.concat([df_peak, df_peak_new], ignore_index=True)
+                        df_peak.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='first', inplace=True)
+                        df_peak.sort_values(by=['Series', 'Peak_Temperature'], inplace=True)
                         df_peak.reset_index(drop=True, inplace=True)
                         df_peak.index += 1
 
-                        print(df_peak_new)
-                        print("______________________________________________________________________________")
-                        print("______________________________________________________________________________")
+                    df_peak_all = pd.concat([df_peak_all, df_peak], ignore_index=True)
+                    df_peak_all.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='last', inplace=True)
+                    df_peak_all.sort_values(by=['Series', 'Peak_Temperature'], inplace=True)
+                    df_peak_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
+                    df_peak_all.to_csv(df_peak_path, sep=";", index=False)
 
                 json_peak = df_peak.to_json(orient="index", indent=4)
                 print(df_peak)

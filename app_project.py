@@ -53,11 +53,17 @@ def project_overview(project_id):
     if request.method == "POST":
         if request.form.get('action'):
 
-            if request.form.get("action") == "delete_project":
+            if request.form.get("action") == "name_edit":
+                name = request.form["project_name"]
+                if name and name != "":
+                    project.name = name
+                    db.session.commit()
+
+            elif request.form.get("action") == "delete_project":
                 delete_project(project_id)
                 return redirect(url_for('hello_world'))
 
-            if request.form.get("action") == "generate_peaks":
+            elif request.form.get("action") == "generate_peaks":
                 find_peak_height = request.form["project_find_peak_height"]
                 find_peak_prominence = request.form["project_find_peak_prominence"]
 
