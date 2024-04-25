@@ -31,7 +31,6 @@ def hello_world():  # put application's code here
     return redirect(url_for('project.create_new_project'))
 
 
-# für href="{{ url_for('data', filename='measurement.csv') }}" bzw. Download
 @app.route('/data/<path:filename>')
 def data(filename):
     return send_from_directory('data', filename)
