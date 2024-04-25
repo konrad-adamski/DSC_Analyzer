@@ -102,17 +102,9 @@ def sample_segment_view(project_id, sample, segment):
                                                   this_height=0, this_prominence=0.0001)
 
                         peak_df_area_calc(df_peak_new, df_measurement)
-                        df_peak = pd.concat([df_peak, df_peak_new], ignore_index=True)
-                        df_peak.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='first', inplace=True)
-                        df_peak.sort_values(by=['Series', 'Peak_Temperature'], inplace=True)
-                        df_peak.reset_index(drop=True, inplace=True)
-                        df_peak.index += 1
+                        add_new_peaks_to_df(df_peak, df_peak_new)
 
-                    df_peak_all = pd.concat([df_peak_all, df_peak], ignore_index=True)
-                    df_peak_all.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='last', inplace=True)
-                    df_peak_all.sort_values(by=['Series', 'Peak_Temperature'], inplace=True)
-                    df_peak_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
-                    df_peak_all.to_csv(df_peak_path, sep=";", index=False)
+                    update_peaks_csv(df_peak_all, df_peak, project)
 
                 json_peak = df_peak.to_json(orient="index", indent=4)
                 print(df_peak)
@@ -128,3 +120,37 @@ def sample_segment_view(project_id, sample, segment):
             return redirect(url_for('project.project_overview', project_id=project.id))
 
     return redirect(url_for('project.create_new_project'))
+
+
+def add_new_peaks_to_df(old_df, new_df):
+    old_df = pd.concat([old_df, new_df], ignore_index=True)
+    old_df.drop_duplicates(subset=['Peak_Temperature'], keep='first', inplace=True)
+    old_df.sort_values(by=['Peak_Temperature'], inplace=True)
+    old_df.reset_index(drop=True, inplace=True)
+    old_df.index += 1
+    return True
+
+
+def update_peaks_csv(all_peaks_dframe, series_peaks_df, project):
+
+    # Werte zusammenführen
+    all_peaks_dframe = pd.concat([all_peaks_dframe, series_peaks_df], ignore_index=True)
+
+    # neue Werte behalten
+    all_peaks_dframe.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='last', inplace=True)
+
+    # Temporäre Spalten für die Sortierung
+    all_peaks_dframe["Sample_Numb"] = all_peaks_dframe['Series'].str.extract('(\d+)').astype(int)
+    all_peaks_dframe['Segment'] = all_peaks_dframe['Series'].str.extract('_(S\d+)')  # Extrahiert den Suffix
+
+    # Sortieren des DataFrames zuerst nach Sample_Numb, dann Segment und zuletzt nach Peak_Temperature
+    all_peaks_dframe = all_peaks_dframe.sort_values(by=['Sample_Numb', 'Segment', 'Peak_Temperature'])
+
+    # Entfernen der temporären Spalten
+    all_peaks_dframe.drop(columns=['Sample_Numb', 'Segment'], inplace=True)
+
+    df_peak_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
+    all_peaks_dframe.to_csv(df_peak_path, sep=";", index=False)
+
+    return True
+

@@ -9,13 +9,14 @@
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.0.1.min.js"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style/plot.css') }}?v=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/project_form.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/form.css') }}?v=1">
 
 
 {% endblock head %}
 {% block title %}{{ sample }} - Segment {{ segment }}{% endblock title %}
 
 {% block large_navigation %}
+    <a  class="mdl-navigation__link" href="{{ url_for('project.project_overview', project_id = project_id) }}">This Project</a>
     {% if previous_sample %}
         <a class="mdl-navigation__link" href="{{ url_for('view.sample_segment_view', project_id = project_id, sample=previous_sample, segment=previous_segment) }}">Previous</a>
     {% endif %}
@@ -121,12 +122,12 @@
 <script>
      var jsonPeak = {{ jsonPeak|safe }};
      var jsonMeasurement = {{ jsonMeasurement|safe }};
-
      var peakCount = {{ peakCount|safe }};
-
      const tableBody = document.querySelector("#peakTable tbody");
-
 </script>
-<script src="{{ url_for('static', filename='script/plot_script.js') }}?v=1.6"></script>
+
+<script src="{{ url_for('static', filename='script/view_part1_table.js') }}?v=1.1"></script>
+<script src="{{ url_for('static', filename='script/view_part2_init_&_functions.js') }}?v=1.1"></script>
+<script src="{{ url_for('static', filename='script/view_part3_plot.js') }}?v=1.0"></script>
 
 {% endblock content %}

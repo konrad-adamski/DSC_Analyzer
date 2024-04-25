@@ -8,8 +8,11 @@
     <!-- Material Design Light (Google) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='mdl/material.min.css') }}">
     <script src="{{ url_for('static', filename='mdl/material.min.js') }}"></script>
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Other -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/basic.css') }}?v=1">
+
     
     {% block head %}{% endblock head %}
 </head>

@@ -14,6 +14,12 @@ from utils.project_edit import delete_project
 project_bp = Blueprint('project', __name__)
 
 
+@project_bp.route('/projects_list/', methods=['GET', 'POST'])
+def projects_list():
+    projects = Project.query.all()
+    return render_template("projects_list.html", projects=projects)
+
+
 @project_bp.route('/new/', methods=['GET', 'POST'])
 def create_new_project():
     if request.method == "POST":
@@ -94,8 +100,4 @@ def project_overview(project_id):
     context["project"] = project
     return render_template('project_overview.html', **context)
 
-
-@project_bp.route('/list')
-def projects_list():
-    return "Project List"
 

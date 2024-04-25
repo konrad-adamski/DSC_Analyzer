@@ -1,0 +1,14 @@
+
+a {
+    color: blue;
+}
+
+a:hover {
+    color: #6a1e98; /* Farbe beim Darüberfahren mit der Maus */
+}
+
+hr {
+    width: 100%;
+    margin: 20px 0;
+}
+
