@@ -26,7 +26,14 @@
 {% endblock large_navigation %}
 
 {% block side_navigation %}
-    <a class="mdl-navigation__link" href="">Link</a>
+    {% if next_sample %}
+    <a class="mdl-navigation__link" href="{{ url_for('view.sample_segment_view', project_id = project_id, sample=next_sample, segment=next_segment) }}">Next</a>
+    {% endif %}
+    {% if previous_sample %}
+        <a class="mdl-navigation__link" href="{{ url_for('view.sample_segment_view', project_id = project_id, sample=previous_sample, segment=previous_segment) }}">Previous</a>
+    {% endif %}
+    <a class ="navigation__separator"></a>
+    <a  class="mdl-navigation__link" href="{{ url_for('project.project_overview', project_id = project_id) }}">This Project</a>
 {% endblock side_navigation %}
 
 {% block content %}

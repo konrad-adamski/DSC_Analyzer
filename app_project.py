@@ -17,6 +17,9 @@ project_bp = Blueprint('project', __name__)
 @project_bp.route('/projects_list/', methods=['GET', 'POST'])
 def projects_list():
     projects = Project.query.all()
+    print(type(projects))
+    if not projects:
+        return redirect(url_for('project.create_new_project'))
     return render_template("projects_list.html", projects=projects)
 
 
@@ -55,6 +58,8 @@ def create_new_project():
 def project_overview(project_id):
     context = {}
     project = Project.query.get(project_id)
+    if project is None:
+        return redirect(url_for('project.projects_list'))
 
     if request.method == "POST":
         if request.form.get('action'):
@@ -67,7 +72,7 @@ def project_overview(project_id):
 
             elif request.form.get("action") == "delete_project":
                 delete_project(project_id)
-                return redirect(url_for('hello_world'))
+                return redirect(url_for('project.projects_list'))
 
             elif request.form.get("action") == "generate_peaks":
                 find_peak_height = request.form["project_find_peak_height"]

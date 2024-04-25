@@ -9,12 +9,12 @@
 
 
 {% block large_navigation %}
-    <a class="mdl-navigation__link" href="">Link</a>
+    <a class="mdl-navigation__link" href="{{ url_for('project.create_new_project') }}">New Project</a>
 {% endblock large_navigation %}
 
 
 {% block side_navigation %}
-    <a class="mdl-navigation__link" href="">Link</a>
+    <a class="mdl-navigation__link" href="{{ url_for('project.create_new_project') }}">New Project</a>
 {% endblock side_navigation %}
 
 
@@ -23,29 +23,39 @@
         <div style="overflow: auto; width: 100%;">
             <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" style="width: 100%; min-width: 896px;">
                 <tr>
-                    <th>Open</th>
+                    <th>Edit</th>
                     <th>ID</th>
                     <th>Name</th>
                     <th>ASCII File</th>
-                    <th>Measurements</th>
-                    <th>Peaks</th>
+                    <th>Measurements CSV</th>
+                    <th>Peaks CSV</th>
                 </tr>
                 {% for project in projects %}
                 <tr>
-                    <td><a href="{{ url_for('project.project_overview', project_id = project.id) }}">Click</a></td>
+                    <td><a class = "a_icon" href="{{ url_for('project.project_overview', project_id = project.id) }}">
+                            <img class = "img_icon" src="{{ url_for('static', filename='icons/edit_icon.svg') }}" alt="Click">
+                        </a>
+                    </td>
                     <td>{{ project.id }}</td>
                     <td>{{ project }}</td>
-                    <td><a href="{{ url_for('data', filename=project.ascii_file) }}">Open</a></td>
+                    <td><a class = "a_icon" href="{{ url_for('data', filename=project.ascii_file) }}">
+                            <img class = "img_icon" src="{{ url_for('static', filename='icons/file_icon.svg') }}" alt="Click">
+                        </a>
+                    </td>
                     <td>
                         {% if project.measurements_csv %}
-                            <a href="{{ url_for('data', filename=project.measurements_csv) }}">Download CSV</a>
+                            <a class = "a_icon" href="{{ url_for('data', filename=project.measurements_csv) }}">
+                                <img class = "img_icon" src="{{ url_for('static', filename='icons/download_icon.svg') }}" alt="Click">
+                            </a>
                         {% else %}
                             <b>-</b>
                         {% endif %}
                     </td>
                     <td>
                         {% if project.peaks_csv %}
-                            <a href="{{ url_for('data', filename=project.peaks_csv) }}">Download CSV</a>
+                            <a class = "a_icon" href="{{ url_for('data', filename=project.peaks_csv) }}">
+                                <img class = "img_icon" src="{{ url_for('static', filename='icons/download_icon.svg') }}" alt="Click">
+                            </a>
                         {% else %}
                             <b>-</b>
                         {% endif %}

@@ -27,8 +27,8 @@ app.register_blueprint(view_bp, url_prefix='/view')
 
 
 @app.route('/')
-def hello_world():  # put application's code here
-    return redirect(url_for('project.create_new_project'))
+def index():
+    return redirect(url_for('project.projects_list'))
 
 
 @app.route('/data/<path:filename>')

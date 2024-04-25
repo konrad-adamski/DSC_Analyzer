@@ -1,14 +1,31 @@
 
-a {
-    color: blue;
+.a_icon {
+    display: inline-block; /* Damit padding und border-radius angewendet werden */
+    padding: 5px; /* Abstand um das Icon */
+    text-align: center; /* Zentriert den Text bzw. das Bild horizontal */
+    border-radius: 50%; /* Macht den Hintergrund rund */
 }
 
-a:hover {
+.a_icon:hover {
     color: #6a1e98; /* Farbe beim Darüberfahren mit der Maus */
+    background: rgba(73, 117, 142, 0.24);
 }
 
 hr {
     width: 100%;
     margin: 20px 0;
+}
+
+.img_icon {
+    vertical-align: middle; /* Zentriert das Bild vertikal */
+    height: 90%; /* Nutzt die volle Höhe des Elternelements */
+    width: auto; /* Erhält das Seitenverhältnis des Bildes */
+}
+
+
+
+.navigation__separator {
+    border-top: 1px solid #ddd;
+    margin: 6px 12px;
 }
 
