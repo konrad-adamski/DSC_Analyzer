@@ -17,6 +17,7 @@
 
 ## Pakete
 - pip install scipy
+- pip install XlsxWriter
 
 
 
