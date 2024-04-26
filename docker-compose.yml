@@ -1,11 +1,12 @@
 version: '3.11.8'
 services:
-  web:
-    image: konrad09/dsc_analyzer:latest
+  DSC_Analyzer:   # Dienstname
+    build: .
     ports:
-      - "8000:5000"
+      - "8000:8000"
     environment:
       - FLASK_ENV=development
       - FLASK_APP=app.py
     volumes:
       - ./<your_data_folder>:/app/data
+      - ./<your_instance_folder>:/app/instance
