@@ -3,7 +3,7 @@ import xlsxwriter
 
 
 # add to excel-------------------------------------------------------------------------------
-def add_to_excel(dframe_in, writer, my_sheet_name="1", with_index=False):
+def add_to_excel(dframe_in, writer, my_sheet_name="Sheet 1", with_index=False):
     dframe = dframe_in.copy()
 
     if with_index:

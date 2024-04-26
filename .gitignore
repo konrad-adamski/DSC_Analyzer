@@ -4,6 +4,7 @@
 /env/
 
 /templates/empty_template.html
+
 **/.idea/
 **/.__pycache__/
 **/.ipynb_checkpoints/

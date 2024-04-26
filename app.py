@@ -68,10 +68,12 @@ def download_excel(project_id, attribute, filename):
             df = df[df["Series"] == series]
         elif attribute == "measurements_csv":
             df = df[[series]]
+            
+    sheet_name = str(attribute).split('_')[0]
 
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        add_to_excel(df, writer)
+        add_to_excel(df, writer, sheet_name)
     output.seek(0)
 
     # Sicherstellen, dass der Dateiname sicher ist (keine ungültigen Zeichen enthält)
