@@ -8,6 +8,6 @@
 **/.ipynb_checkpoints/
 DSC_Notebooks/.ipynb_checkpoints
 
-instance/
+instance/db.sqlite
 
 .dockerignore

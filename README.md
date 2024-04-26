@@ -4,12 +4,9 @@
 - Starten Sie die Anwendung mit "python app.py"
 - über http://127.0.0.1:5000 können Sie auf die App zugreifen.
 - Über http://127.0.0.1:5000/view/project_4/C5/S5 können Sie auf dem Beispieldatensatz zugreifen.
-
-# Docker
-- Holen Sie alle Daten aus der Repository.
-- Starten Sie docker-compose up
-- über http://127.0.0.1:8000 können Sie auf die App zugreifen.
-
+- 
+# ACHTUNG!
+- Ordner "data" und "instance" sind für die Funktionalität der App von größter Bedeutung! Dort werden die Daten gespeichert und verwaltet!
 
 ## Pakete
 - pip install scipy

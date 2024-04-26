@@ -1,9 +1,0 @@
-version: '3.11.8'
-services:
-  htw_dsc_analyzer_v2:
-    build: .
-    ports:
-      - "8000:5000"
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app.py
