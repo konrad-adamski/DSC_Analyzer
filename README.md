@@ -9,7 +9,7 @@
 ## Docker-Compose
 - Gehen Sie in dem Ordner **docker** und führen Sie "docker-compose up" aus
 - Über http://127.0.0.1:5000 können Sie auf die App zugreifen.
-- Die Daten werden in den Unterordnern des **docker** Ordner gespeichert
+- Die Daten werden in den Unterordnern des **docker** Ordners gespeichert
 
 
 
