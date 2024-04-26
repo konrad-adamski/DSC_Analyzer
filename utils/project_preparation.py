@@ -4,7 +4,7 @@ from io import StringIO
 
 import numpy as np
 import pandas as pd
-from flask import current_app, redirect, url_for
+from flask import current_app
 
 from models import Project
 from utils.database import db

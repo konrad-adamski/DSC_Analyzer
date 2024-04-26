@@ -1,12 +1,9 @@
 version: '3.11.8'
 services:
-  dsc_analyzer:
+  htw_dsc_analyzer:
     build: .
     ports:
       - "8000:5000"
     environment:
       - FLASK_ENV=development
       - FLASK_APP=app.py
-    volumes:
-      - ./data:/app/data
-      - ./instance:/app/instance

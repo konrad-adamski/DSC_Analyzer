@@ -1,5 +1,5 @@
 import os
-from flask import current_app, redirect, url_for
+from flask import current_app
 from models import Project
 from utils.database import db
 

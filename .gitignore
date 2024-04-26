@@ -10,5 +10,4 @@ DSC_Notebooks/.ipynb_checkpoints
 
 instance/
 
-Dockerfile
 .dockerignore
