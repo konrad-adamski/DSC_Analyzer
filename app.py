@@ -81,4 +81,4 @@ def download_excel(project_id, attribute, filename):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
