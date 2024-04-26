@@ -26,36 +26,36 @@
                     <th>Edit</th>
                     <th>ID</th>
                     <th>Name</th>
-                    <th>ASCII File</th>
-                    <th>Measurements CSV</th>
-                    <th>Peaks CSV</th>
+                    <th>Original Data</th>
+                    <th>Measurements</th>
+                    <th>Peaks</th>
                 </tr>
                 {% for project in projects %}
                 <tr>
                     <td><a class = "a_icon" href="{{ url_for('project.project_overview', project_id = project.id) }}">
-                            <img class = "img_icon" src="{{ url_for('static', filename='icons/edit_icon.svg') }}" alt="Click">
+                            <img class = "img_icon" src="{{ url_for('static', filename='icons/edit.svg') }}" alt="Click">
                         </a>
                     </td>
                     <td>{{ project.id }}</td>
                     <td>{{ project }}</td>
                     <td><a class = "a_icon" href="{{ url_for('data', filename=project.ascii_file) }}">
-                            <img class = "img_icon" src="{{ url_for('static', filename='icons/file_icon.svg') }}" alt="Click">
+                            <img class = "img_icon" src="{{ url_for('static', filename='icons/download_txt.svg') }}" alt="Click">
                         </a>
                     </td>
                     <td>
                         {% if project.measurements_csv %}
-                            <a class = "a_icon" href="{{ url_for('data', filename=project.measurements_csv) }}">
-                                <img class = "img_icon" src="{{ url_for('static', filename='icons/download_icon.svg') }}" alt="Click">
-                            </a>
+                            <div class="button_img" onclick="excelDownload({{ project.id }}, 'measurements_csv')">
+                                <img class="img_icon" src="{{ url_for('static', filename='icons/download_xlsx.svg') }}" alt="Download X">
+                            </div>
                         {% else %}
                             <b>-</b>
                         {% endif %}
                     </td>
                     <td>
                         {% if project.peaks_csv %}
-                            <a class = "a_icon" href="{{ url_for('data', filename=project.peaks_csv) }}">
-                                <img class = "img_icon" src="{{ url_for('static', filename='icons/download_icon.svg') }}" alt="Click">
-                            </a>
+                            <div class="button_img" onclick="excelDownload({{ project.id }}, 'peaks_csv')">
+                                <img class="img_icon" src="{{ url_for('static', filename='icons/download_xlsx.svg') }}" alt="Download X">
+                            </div>
                         {% else %}
                             <b>-</b>
                         {% endif %}
@@ -65,4 +65,5 @@
             </table>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='script/download.js') }}?v=1.0"></script>
 {% endblock content %}

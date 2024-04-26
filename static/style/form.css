@@ -15,9 +15,9 @@
     margin-right: 10px; /* Optionaler Abstand rechts vom Input-Feld */
 }
 
+
 .form-group a {
-    width: 200px; /* Feste Breite für Input-Felder */
-    margin-right: 10px; /* Optionaler Abstand rechts vom Input-Feld */
+    margin-right: 10px;
     color: blue;
 }
 

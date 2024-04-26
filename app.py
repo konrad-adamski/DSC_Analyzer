@@ -1,8 +1,11 @@
 import os
 
-from flask import Flask, send_from_directory, redirect, url_for, send_file
+from flask import Flask, send_from_directory, redirect, url_for, send_file, render_template, jsonify, request
+from werkzeug.utils import secure_filename
+
 from app_view import view_bp
 from app_project import project_bp
+from models import Project
 from utils.database import init_db
 from utils.template_tag import loop, loop_max3
 
@@ -41,26 +44,40 @@ def data(filename):
     return send_from_directory('data', filename)
 
 
-@app.route('/download_excel')
-def download_excel():
-    # Erstelle ein DataFrame als Beispiel
-    data = {'Number': [1, 2, 3], 'Amount': [50.0, 20.5, 31.75], 'Description': ['A', 'B', 'C']}
-    df = pd.DataFrame(data)
+@app.route('/download_excel/<int:project_id>/<string:attribute>/<string:filename>/')
+def download_excel(project_id, attribute, filename):
+    sample = request.args.get('sample')
+    segment = request.args.get('segment')
 
-    # Erstelle eine BytesIO-Instanz, um die Datei im Speicher zu speichern
+    project = Project.query.get(project_id)
+    if not project:
+        return jsonify({'error': 'Project not found'}), 404
+
+    attr_value = getattr(project, attribute, None)
+    if not attr_value:
+        return jsonify({'error': 'Attribute not found'}), 404
+
+    file_path = str(os.path.join(app.config['UPLOAD_FOLDER'], attr_value))
+    df = pd.read_csv(file_path, sep=';')
+
+    if sample and segment:
+        series = sample + '_S' + segment
+        print(series)
+
+        if attribute == "peaks_csv":
+            df = df[df["Series"] == series]
+        elif attribute == "measurements_csv":
+            df = df[[series]]
+
     output = BytesIO()
-
-    # Erstelle einen Pandas Excel writer mit XlsxWriter als Engine und speichere in BytesIO
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         add_to_excel(df, writer)
-        #writer.save()
-        #writer.book.close()
-
-    # Gehe zum Anfang des BytesIO-Stream, um die Datei zu senden
     output.seek(0)
 
+    # Sicherstellen, dass der Dateiname sicher ist (keine ungültigen Zeichen enthält)
+    safe_filename = secure_filename(filename)
     return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                     as_attachment=True, download_name='download.xlsx')
+                     as_attachment=True, download_name=safe_filename)
 
 
 if __name__ == '__main__':

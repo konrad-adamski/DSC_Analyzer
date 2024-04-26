@@ -23,7 +23,6 @@ def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
 
 
 def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
-    print("HHHHHHHHHHHHHHAAAAAAAAAALLLLLLLLLLO")
     if "S3" in series_name:
         dframe = -dframe
         # Finden der Peaks

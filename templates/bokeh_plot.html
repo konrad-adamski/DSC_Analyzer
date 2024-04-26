@@ -10,6 +10,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style/plot.css') }}?v=1">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/form.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/basic.css') }}?v=1">
 
 
 {% endblock head %}
@@ -60,7 +61,7 @@
         </form>
         <div id="plot"></div>
     </div>
-    <div class="mdl-cell mdl-cell--5-col" style="padding: 5px 2px; flex-grow: 1; width: auto; min-width: 420px; max-width: 760px;">
+    <div class="mdl-cell mdl-cell--4-col" style="padding: 5px 2px; flex-grow: 1; width: auto; min-width: 420px; max-width: 760px;">
         <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" id="peakTable" style="margin-top: 25px;width: 100%;">
             <thead>
                 <tr>
@@ -122,9 +123,13 @@
             </div>
         </div>
     </div>
+    <div class="mdl-cell mdl-cell--1-col" style="width: 40px;">
+        <div class="button_img" onclick="excelDownload_for_series({{ project_id }}, 'peaks_csv', '{{ sample }}', '{{ segment }}')">
+            <img class="img_icon" src="{{ url_for('static', filename='icons/download_xlsx.svg') }}" alt="Download X">
+        </div>
+    </div>
   </div>
 </div>
-
 
 <script>
      var jsonPeak = {{ jsonPeak|safe }};
@@ -136,5 +141,6 @@
 <script src="{{ url_for('static', filename='script/view_part1_table.js') }}?v=1.1"></script>
 <script src="{{ url_for('static', filename='script/view_part2_init_&_functions.js') }}?v=1.1"></script>
 <script src="{{ url_for('static', filename='script/view_part3_plot.js') }}?v=1.0"></script>
+<script src="{{ url_for('static', filename='script/download.js') }}?v=1.0"></script>
 
 {% endblock content %}

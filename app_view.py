@@ -102,7 +102,7 @@ def sample_segment_view(project_id, sample, segment):
                                                   this_height=0, this_prominence=0.0001)
 
                         peak_df_area_calc(df_peak_new, df_measurement)
-                        add_new_peaks_to_df(df_peak, df_peak_new)
+                        df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
 
                     update_peaks_csv(df_peak_all, df_peak, project)
 
@@ -128,7 +128,7 @@ def add_new_peaks_to_df(old_df, new_df):
     old_df.sort_values(by=['Peak_Temperature'], inplace=True)
     old_df.reset_index(drop=True, inplace=True)
     old_df.index += 1
-    return True
+    return old_df
 
 
 def update_peaks_csv(all_peaks_dframe, series_peaks_df, project):
@@ -148,9 +148,8 @@ def update_peaks_csv(all_peaks_dframe, series_peaks_df, project):
 
     # Entfernen der temporären Spalten
     all_peaks_dframe.drop(columns=['Sample_Numb', 'Segment'], inplace=True)
-
     df_peak_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
     all_peaks_dframe.to_csv(df_peak_path, sep=";", index=False)
 
-    return True
+    return all_peaks_dframe
 

@@ -1,4 +1,4 @@
-
+/* Text or CSV  */
 .a_icon {
     display: inline-block; /* Damit padding und border-radius angewendet werden */
     padding: 5px; /* Abstand um das Icon */
@@ -11,21 +11,34 @@
     background: rgba(73, 117, 142, 0.24);
 }
 
-hr {
-    width: 100%;
-    margin: 20px 0;
+/* Excel */
+.button_img {
+    display: inline-block; /* Damit padding und border-radius angewendet werden */
+    padding: 5px; /* Abstand um das Bild */
+    text-align: center; /* Zentriert das Bild horizontal */
+    border-radius: 50%; /* Macht den Hintergrund rund */
+    transition: background-color 0.3s; /* Weicher Übergang für den Hintergrund */
 }
 
+.button_img:hover {
+    background-color: rgba(73, 117, 142, 0.24); /* Farbe beim Darüberfahren mit der Maus */
+    cursor: pointer;
+}
+
+/* Text, CSV  or Excel */
 .img_icon {
     vertical-align: middle; /* Zentriert das Bild vertikal */
-    height: 90%; /* Nutzt die volle Höhe des Elternelements */
+    height: 30px;
     width: auto; /* Erhält das Seitenverhältnis des Bildes */
 }
 
-
-
+/* Other classes */
 .navigation__separator {
     border-top: 1px solid #ddd;
     margin: 6px 12px;
 }
 
+hr {
+    width: 100%;
+    margin: 20px 0;
+}
