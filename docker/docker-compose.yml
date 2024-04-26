@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  htwd_dsc_analyzer_app:
+    build: ../
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./instance:/app/instance
+      - ./data:/app/data

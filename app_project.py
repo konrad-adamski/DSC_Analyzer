@@ -8,7 +8,7 @@ from utils.calc import get_peak_df, peak_df_area_calc
 from utils.database import db
 import pandas as pd
 
-from utils.project_preparation import get_info_df, split_text, get_measurement_df, project_preparation
+from utils.project_preparation import project_preparation
 from utils.project_edit import delete_project
 
 project_bp = Blueprint('project', __name__)

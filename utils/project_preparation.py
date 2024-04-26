@@ -49,7 +49,7 @@ def project_preparation(project_id):
 
 
 def split_text(file_path):
-    with open(file_path, "r") as datei:
+    with open(file_path, "r", encoding="ISO-8859-1") as datei:
         inhalt = datei.read()
     return inhalt.strip().split("##")  # returns info_text and measurement_text
 

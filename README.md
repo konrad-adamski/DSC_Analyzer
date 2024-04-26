@@ -14,4 +14,8 @@
 - pip install pandas
 
 
+#### Erkenntnisse
+- Die Textdatei ist ISO-8859-1 codiert (pip install chardet)
+
+
 

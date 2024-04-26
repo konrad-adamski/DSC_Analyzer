@@ -1,8 +1,6 @@
 **/__pycache__
 **/.idea
+/docker/
 
 .gitignore
-.dockerignore
-Dockerfile
-docker-compose.yml
 README.md
