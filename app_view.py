@@ -104,7 +104,7 @@ def sample_segment_view(project_id, sample, segment):
                         peak_df_area_calc(df_peak_new, df_measurement)
                         df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
 
-                    update_peaks_csv(df_peak_all, df_peak, project)
+                    update_peaks_csv(df_peak_all, df_peak, project, series)
 
                 json_peak = df_peak.to_json(orient="index", indent=4)
                 print(df_peak)
@@ -131,17 +131,17 @@ def add_new_peaks_to_df(old_df, new_df):
     return old_df
 
 
-def update_peaks_csv(all_peaks_dframe, series_peaks_df, project):
+def update_peaks_csv(all_peaks_dframe, series_peaks_df, project, series):
 
-    # Werte zusammenführen
+    # Alte Werte löschen
+    all_peaks_dframe = all_peaks_dframe.drop(all_peaks_dframe[all_peaks_dframe["Series"] == series].index)
+
+    # Neue Werte einfügen
     all_peaks_dframe = pd.concat([all_peaks_dframe, series_peaks_df], ignore_index=True)
-
-    # neue Werte behalten
-    all_peaks_dframe.drop_duplicates(subset=['Series', 'Peak_Temperature'], keep='last', inplace=True)
 
     # Temporäre Spalten für die Sortierung
     all_peaks_dframe["Sample_Numb"] = all_peaks_dframe['Series'].str.extract('(\d+)').astype(int)
-    all_peaks_dframe['Segment'] = all_peaks_dframe['Series'].str.extract('_(S\d+)')  # Extrahiert den Suffix
+    all_peaks_dframe['Segment'] = all_peaks_dframe['Series'].str.extract('_(S\d+)')  # Extrahiert dem Suffix
 
     # Sortieren des DataFrames zuerst nach Sample_Numb, dann Segment und zuletzt nach Peak_Temperature
     all_peaks_dframe = all_peaks_dframe.sort_values(by=['Sample_Numb', 'Segment', 'Peak_Temperature'])
