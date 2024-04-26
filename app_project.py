@@ -3,9 +3,9 @@ import os
 from flask import Blueprint, redirect, url_for, request, render_template, current_app
 from werkzeug.utils import secure_filename
 
-from models import Project
+from db_models import Project
 from utils.calc import get_peak_df, peak_df_area_calc
-from utils.database import db
+from database import db
 import pandas as pd
 
 from utils.project_preparation import project_preparation

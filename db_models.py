@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from zoneinfo import ZoneInfo  # Importieren der ZoneInfo Klasse
 
-from utils.database import db
+from database import db
 
 
 def load_default_config():

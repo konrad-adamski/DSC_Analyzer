@@ -2,12 +2,11 @@ import os
 import re
 from io import StringIO
 
-import numpy as np
 import pandas as pd
 from flask import current_app
 
-from models import Project
-from utils.database import db
+from db_models import Project
+from database import db
 
 
 def project_preparation(project_id):

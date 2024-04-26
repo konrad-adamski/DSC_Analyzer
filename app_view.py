@@ -3,7 +3,7 @@ import pandas as pd
 from io import StringIO
 from flask import Blueprint, abort, request, render_template, redirect, url_for, current_app
 
-from models import Project
+from db_models import Project
 from utils.calc import get_nearest_value, area_calc, get_peak_df, peak_df_area_calc
 
 view_bp = Blueprint('view', __name__)

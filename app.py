@@ -1,12 +1,12 @@
 import os
 
-from flask import Flask, send_from_directory, redirect, url_for, send_file, render_template, jsonify, request
+from flask import Flask, send_from_directory, redirect, url_for, send_file, jsonify, request
 from werkzeug.utils import secure_filename
 
 from app_view import view_bp
 from app_project import project_bp
-from models import Project
-from utils.database import init_db
+from db_models import Project
+from database import init_db
 from utils.template_tag import loop, loop_max3
 
 import pandas as pd

@@ -1,7 +1,7 @@
 import os
 from flask import current_app
-from models import Project
-from utils.database import db
+from db_models import Project
+from database import db
 
 
 def delete_project(project_id: int):
