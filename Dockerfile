@@ -1,5 +1,5 @@
 # Verwende ein offizielles Python-Image als Basis
-FROM python:3.11
+FROM python:3.11.6-slim
 
 # Setze das Arbeitsverzeichnis im Container
 WORKDIR /app
@@ -10,6 +10,7 @@ RUN pip install -r requirements.txt
 
 # Kopiere den Rest des Codes in den Container
 COPY . .
+
 
 RUN rm -rf instance/*
 RUN rm -rf data/*
