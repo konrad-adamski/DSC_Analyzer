@@ -84,7 +84,7 @@ def get_measurement_df(measurements_text, info_df):
 
     # 1) Anpassung der Spaltennamen
     num_cols = len(info_df)
-    new_columns = [info_df.at[i, 'IDENTITY'] + '_' + info_df.at[i, 'SEGMENT'] for i in range(num_cols)]
+    new_columns = [info_df.at[i, 'SAMPLE'] + '_' + info_df.at[i, 'SEGMENT'] for i in range(num_cols)]
     new_columns = [col.replace("/5", "") for col in new_columns]
     measurements_df.columns = new_columns
 
