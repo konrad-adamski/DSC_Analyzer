@@ -22,6 +22,59 @@ def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
     return df_peak
 
 
+def get_peak_df_for_searcharea(dframe, this_height=0.3, this_prominence=0.01, start=0, end=1):
+    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+    dframe_area = dframe.loc[start:end]
+
+    for col in list(dframe_area.columns):
+        data = get_series_peaks_data_single(dframe_area, col, this_height, this_prominence)
+
+        if df_peak.empty:
+            df_peak = pd.DataFrame(data)
+        else:
+            df_peak = pd.concat([df_peak, pd.DataFrame(data)], ignore_index=True)
+
+    return df_peak
+
+
+def get_peak_df_by_searchareas(dframe, this_height=0.3, this_prominence=0.01, search_areas=None):
+    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+
+    for area in search_areas:
+        start = int(area["start"])
+        end = int(area["end"])
+        dframe_area = dframe.loc[start:end]
+
+        for col in list(dframe_area.columns):
+            data = get_series_peaks_data_single(dframe_area, col, this_height, this_prominence)
+
+            if df_peak.empty:
+                df_peak = pd.DataFrame(data)
+            else:
+                df_peak = pd.concat([df_peak, pd.DataFrame(data)], ignore_index=True)
+
+    return df_peak
+
+
+def get_series_peaks_data_single(dframe, series_name, this_height=0.0, this_prominence=0.01,
+                                 prev_prominence=0.0, pre_prev_prominence=0.0):
+    data = get_series_peaks_data(dframe, series_name, this_height, this_prominence)
+
+    if this_prominence == pre_prev_prominence:  # verhindert, dass man die Funktion ewig kreist
+        return data
+
+    count = len(data["Peak_Temperature"])
+    if count == 0:
+        next_prominence = this_prominence - 0.001
+        data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
+                                            this_prominence, prev_prominence)
+    elif count > 1:
+        next_prominence = this_prominence + 0.001
+        data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
+                                            this_prominence, prev_prominence)
+    return data
+
+
 def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
     if "S3" in series_name:
         dframe = -dframe
@@ -80,15 +133,13 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
         this_start = start_points[i]
         this_peak = peaks[i]
 
-        print("dgdghadjaskdasjkdhasjkdhasjkdhasjkhdka")
-
         # Eingrenzung der Series
 
-        if len(list(range(this_start, this_peak))) >= 3:  # Start mind. drei Indexpunkte entfernt vom Peak (Problem beim 3. Peak)
+        if len(list(range(this_start,
+                          this_peak))) >= 3:  # Start mind. drei Indexpunkte entfernt vom Peak (Problem beim 3. Peak)
             second_der_area = second_derivative_series.loc[range(this_start, this_peak)]
         else:
-            second_der_area = second_derivative_series.loc[range(this_start-25, this_peak)]
-        print(this_start, this_peak)
+            second_der_area = second_derivative_series.loc[range(this_start - 25, this_peak)]
 
         # Umgekehrte For-Schleife durch die Series UM die negativen Werte "am Peak" zu löschen
         for index in reversed(second_der_area.index):

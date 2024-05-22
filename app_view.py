@@ -4,7 +4,7 @@ from io import StringIO
 from flask import Blueprint, abort, request, render_template, redirect, url_for, current_app
 
 from db_models import Project
-from utils.calc import get_nearest_value, area_calc, get_peak_df, peak_df_area_calc
+from utils.calc import get_nearest_value, area_calc, get_peak_df, peak_df_area_calc, get_peak_df_for_searcharea
 
 view_bp = Blueprint('view', __name__)
 
@@ -98,8 +98,9 @@ def sample_segment_view(project_id, sample, segment):
                         min_temperature = get_nearest_value(min_temperature, temperature_list)
                         max_temperature = get_nearest_value(max_temperature, temperature_list)
 
-                        df_peak_new = get_peak_df(df_measurement.loc[min_temperature:max_temperature, [series]],
-                                                  this_height=0, this_prominence=0.0001)
+                        df_peak_new = get_peak_df_for_searcharea(df_measurement.loc[:, [series]],
+                                                                 this_height=0, this_prominence=0.01,
+                                                                 start=min_temperature, end=max_temperature)
 
                         peak_df_area_calc(df_peak_new, df_measurement)
                         df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
@@ -132,7 +133,6 @@ def add_new_peaks_to_df(old_df, new_df):
 
 
 def update_peaks_csv(all_peaks_dframe, series_peaks_df, project, series):
-
     # Alte Werte löschen
     all_peaks_dframe = all_peaks_dframe.drop(all_peaks_dframe[all_peaks_dframe["Series"] == series].index)
 
@@ -152,4 +152,3 @@ def update_peaks_csv(all_peaks_dframe, series_peaks_df, project, series):
     all_peaks_dframe.to_csv(df_peak_path, sep=";", index=False)
 
     return all_peaks_dframe
-

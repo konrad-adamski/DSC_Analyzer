@@ -1,10 +1,12 @@
+import json
 import os
 
 from flask import Blueprint, redirect, url_for, request, render_template, current_app
 from werkzeug.utils import secure_filename
 
+from config import load_default
 from db_models import Project
-from utils.calc import get_peak_df, peak_df_area_calc
+from utils.calc import get_peak_df, peak_df_area_calc, get_peak_df_by_searchareas
 from database import db
 import pandas as pd
 
@@ -25,6 +27,8 @@ def projects_list():
 
 @project_bp.route('/new/', methods=['GET', 'POST'])
 def create_new_project():
+    context = {}
+
     if request.method == "POST":
         if request.form.get('name'):
             name = request.form["name"]
@@ -49,14 +53,16 @@ def create_new_project():
 
             # Preparation Process (Transformation)
             project_preparation(new_project.id)
+
             return redirect(url_for('project.project_overview', project_id=new_project.id))
 
-    return render_template('project_new.html')
+    return render_template('project_new.html', **context)
 
 
 @project_bp.route('/<int:project_id>/', methods=['GET', 'POST'])
 def project_overview(project_id):
-    context = {}
+    context = {"peak_max_numb": load_default("max_peak_numb")}
+
     project = Project.query.get(project_id)
     if project is None:
         return redirect(url_for('project.projects_list'))
@@ -75,20 +81,32 @@ def project_overview(project_id):
                 return redirect(url_for('project.projects_list'))
 
             elif request.form.get("action") == "generate_peaks":
-                find_peak_height = request.form["project_find_peak_height"]
-                find_peak_prominence = request.form["project_find_peak_prominence"]
-
                 measurement_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.measurements_csv))
                 df_measurement = pd.read_csv(measurement_csv_path, sep=";", index_col="Temp./°C")
 
+                find_peak_height = request.form["project_find_peak_height"]
+                find_peak_prominence = request.form["project_find_peak_prominence"]
+
+                peak_count = request.form["peak_count"]
+
                 # Bestimmung der Peaks
                 if find_peak_height and find_peak_prominence:
-                    df_peak = get_peak_df(df_measurement,
-                                          this_height=float(find_peak_height),
-                                          this_prominence=float(find_peak_prominence))
-                    project.find_peak_height = find_peak_height
+                    if float(find_peak_height) > 0:
+                        project.find_peak_height = find_peak_height
                     project.find_peak_prominence = find_peak_prominence
                     db.session.commit()
+
+                    if peak_count == "All" or not peak_count:
+                        df_peak = get_peak_df(df_measurement,
+                                              this_height=float(find_peak_height),
+                                              this_prominence=float(find_peak_prominence))
+                    else:
+                        search_areas_json = json.loads(request.form["search_areas"])
+                        df_peak = get_peak_df_by_searchareas(df_measurement,
+                                                             this_height=float(find_peak_height),
+                                                             this_prominence=float(find_peak_prominence),
+                                                             search_areas=search_areas_json)
+
                 else:
                     df_peak = get_peak_df(df_measurement)
 
@@ -104,5 +122,3 @@ def project_overview(project_id):
 
     context["project"] = project
     return render_template('project_overview.html', **context)
-
-
