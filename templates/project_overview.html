@@ -27,7 +27,7 @@
 
 {% block content %}
     <div class="mdl-grid">
-        <div class="mdl-cell" style="width: 400px;">
+        <div class="mdl-cell" style="width: 620px;">
             <form id="nameForm" method="post" >
                 <div class="form-group">
                     <label for="project_name">Project Name:</label>
@@ -88,6 +88,15 @@
             <hr> <!-- Hier wird die Trennlinie eingefügt -->
             <div class="mdl-grid" style="padding-left: 0;">
                  <form id="generatePeaksForm" method="post" >
+                    <div class="form-group">
+                        <label for="peak_count">Number of Peaks:</label>
+                        <select id="peak_count" name="peak_count" onchange="generatePeakFields()" required>
+                            <option value="All">All</option>
+                            {% for i in peak_max_numb|loop %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                      <div class="form-group">
                         <label for="find_peak_height">Peak Search Height:</label>
                         <input class="mdl-js-textfield" type="number" id="find_peak_height" name="project_find_peak_height" min="0" max="1" step="0.01" value="{{ project.find_peak_height}}">
@@ -101,7 +110,8 @@
                         <div id="peak_prominence_info_bubble" style="display: none; position: absolute; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>
 
                     </div>
-
+                    <div id="interval_fields"></div>
+                    <input type="hidden" id="search_areas" name="search_areas">
                      {% if project.peaks_csv %}
                          <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button" onclick="sendGeneratePeaksForm()">Generate Peaks</button>
                      {% else %}
@@ -122,6 +132,62 @@
 
     <script>
 
+    function generatePeakFields() {
+            var peakCount = document.getElementById("peak_count").value;
+            var intervalFields = document.getElementById("interval_fields");
+            intervalFields.innerHTML = ""; // clear previous fields
+
+            let find_peak_height_element = document.getElementById("find_peak_height")
+
+            if (peakCount !== "All" && peakCount !== "") {
+
+                find_peak_height_element.value = 0;
+                find_peak_height_element.readOnly = true;
+                find_peak_height_element.style.backgroundColor = "#f7f7f7";
+
+                for (let i = 1; i <= peakCount; i++) {
+                    let field = document.createElement("div");
+                    field.className = "form-group";
+                    field.innerHTML = `<b style="width: 60px;">Peak ${i}</b><br>`;
+                    field.innerHTML += `<label for="start_value${i}" style="width: 80px;">Start Value:</label>` +
+                        `<input type="number" id="start_value${i}" name="start_value${i}" placeholder="Enter start value" min="-50" max="300" required><br>`;
+
+                    field.innerHTML += `<label for="end_value${i}" style="width: 80px;">End Value:</label>` +
+                        `<input type="number" id="end_value${i}" name="end_value${i}" placeholder="Enter end value" min="-50" max="300" required><br>`;
+
+                    intervalFields.appendChild(field);
+                }
+            } else {
+                find_peak_height_element.readOnly = false;
+                find_peak_height_element.value = {{ project.find_peak_height}};
+                find_peak_height_element.style.backgroundColor = "";
+            }
+        }
+
+        function validateForm() {
+            let peakCount = document.getElementById("peak_count").value;
+            if (peakCount !== "All" && peakCount !== "") {
+                let empty_peaks = [];
+
+                for (let i = 1; i <= peakCount; i++) {
+                    let startValue = document.getElementById(`start_value${i}`).value;
+                    let endValue = document.getElementById(`end_value${i}`).value;
+                    if (startValue === "" || endValue === "") {
+                        empty_peaks.push(i);
+                    }
+                }
+                if (empty_peaks.length > 0) {
+                    if (empty_peaks.length === 1) {
+                        alert(`Please fill out all required fields for Peak ${empty_peaks[0]}.`);
+                    } else {
+                        alert(`Please fill out all required fields for Peaks ${empty_peaks.join(", ")}.`);
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
     function sendNameForm() {
         let form = document.getElementById('nameForm');
         form.submit();
@@ -129,7 +195,21 @@
 
       function sendGeneratePeaksForm() {
          if (confirm('Are you sure you want to generate new Peaks! This will overwrite your changes!')) {
-             document.getElementById('generatePeaksForm').submit();
+             if (validateForm()) {
+                var peakCount = document.getElementById("peak_count").value;
+                var peakValues = [];
+
+                if (peakCount !== "All" && peakCount !== "") {
+                    for (let i = 1; i <= peakCount; i++) {
+                        var startValue = document.getElementById(`start_value${i}`).value;
+                        var endValue = document.getElementById(`end_value${i}`).value;
+                        peakValues.push({ start: startValue, end: endValue });
+                    }
+                }
+
+                document.getElementById('search_areas').value = JSON.stringify(peakValues);
+                document.getElementById('generatePeaksForm').submit();
+            }
          }
     }
 
