@@ -89,13 +89,12 @@
             <div class="mdl-grid" style="padding-left: 0;">
                  <form id="generatePeaksForm" method="post" >
                     <div class="form-group">
-                        <label for="peak_count">Number of Peaks:</label>
-                        <select id="peak_count" name="peak_count" onchange="generatePeakFields()" required>
+                        <label for="peak_count_select">Number of Peaks:</label>
+                        <select id="peak_count_select" name="peak_count_select" onchange="showPeakNumberInput()" required>
                             <option value="All">All</option>
-                            {% for i in peak_max_numb|loop %}
-                                <option value="{{ i }}">{{ i }}</option>
-                            {% endfor %}
+                            <option value="Specific">Specific</option>
                         </select>
+                        <input type="number" id="peak_count_input" style="width: 40px;margin-left: 4px;display: none;" name="peak_count_input" min="1" value="1" onchange="generatePeakFields()">
                     </div>
                      <div class="form-group">
                         <label for="find_peak_height">Peak Search Height:</label>
@@ -131,42 +130,67 @@
     </div>
 
     <script>
+    function showPeakNumberInput() {
+        let peakCount_select = document.getElementById("peak_count_select").value;
+        let find_peak_height_element = document.getElementById("find_peak_height")
 
-    function generatePeakFields() {
-            var peakCount = document.getElementById("peak_count").value;
-            var intervalFields = document.getElementById("interval_fields");
-            intervalFields.innerHTML = ""; // clear previous fields
+        let peak_count_input = document.getElementById('peak_count_input');
 
-            let find_peak_height_element = document.getElementById("find_peak_height")
+        let intervalFields = document.getElementById("interval_fields");
+        intervalFields.innerHTML = ""; // clear previous fields
 
-            if (peakCount !== "All" && peakCount !== "") {
+        if (peakCount_select === "Specific") {
+            find_peak_height_element.value = 0;
+            find_peak_height_element.readOnly = true;
+            find_peak_height_element.style.background = "rgba(128,124,124,0.13)";
+            find_peak_height_element.style.border = "1px solid";
+            peak_count_input.style.display =  'block';
+            generatePeakFields()
 
-                find_peak_height_element.value = 0;
-                find_peak_height_element.readOnly = true;
-                find_peak_height_element.style.backgroundColor = "#f7f7f7";
+        } else {
+            find_peak_height_element.readOnly = false;
+            find_peak_height_element.value = {{ project.find_peak_height}};
+            find_peak_height_element.style.background = "";
+            find_peak_height_element.style.border = "";
+            peak_count_input.value = 1;
+            peak_count_input.style.display =  'none';
 
-                for (let i = 1; i <= peakCount; i++) {
-                    let field = document.createElement("div");
-                    field.className = "form-group";
-                    field.innerHTML = `<b style="width: 60px;">Peak ${i}</b><br>`;
-                    field.innerHTML += `<label for="start_value${i}" style="width: 80px;">Start Value:</label>` +
-                        `<input type="number" id="start_value${i}" name="start_value${i}" placeholder="Enter start value" min="-50" max="300" required><br>`;
-
-                    field.innerHTML += `<label for="end_value${i}" style="width: 80px;">End Value:</label>` +
-                        `<input type="number" id="end_value${i}" name="end_value${i}" placeholder="Enter end value" min="-50" max="300" required><br>`;
-
-                    intervalFields.appendChild(field);
-                }
-            } else {
-                find_peak_height_element.readOnly = false;
-                find_peak_height_element.value = {{ project.find_peak_height}};
-                find_peak_height_element.style.backgroundColor = "";
-            }
         }
 
+
+    }
+
+    function generatePeakFields() {
+    let peakCountInput = document.getElementById("peak_count_input");
+    let peakCount = parseInt(peakCountInput.value, 10);
+
+    let intervalFields = document.getElementById("interval_fields");
+    let currentFieldCount = intervalFields.children.length;
+
+    if (currentFieldCount < peakCount) {
+        // Felder hinzufügen
+        for (let i = currentFieldCount + 1; i <= peakCount; i++) {
+            let field = document.createElement("div");
+            field.className = "form-group";
+            field.innerHTML = `<b style="width: 60px;">Peak ${i}</b><br>`;
+            field.innerHTML += `<label for="start_value${i}" style="width: 80px;">Start Value:</label>` +
+                `<input type="number" id="start_value${i}" name="start_value${i}" placeholder="Enter start value" min="-50" max="300" required><br>`;
+            field.innerHTML += `<label for="end_value${i}" style="width: 80px;">End Value:</label>` +
+                `<input type="number" id="end_value${i}" name="end_value${i}" placeholder="Enter end value" min="-50" max="300" required><br>`;
+            intervalFields.appendChild(field);
+        }
+    } else if (currentFieldCount > peakCount) {
+        // Überzählige Felder entfernen
+        for (let i = currentFieldCount; i > peakCount; i--) {
+            intervalFields.removeChild(intervalFields.lastChild);
+        }
+    }
+}
+
         function validateForm() {
-            let peakCount = document.getElementById("peak_count").value;
-            if (peakCount !== "All" && peakCount !== "") {
+            let peakCount_select = document.getElementById("peak_count_select").value;
+            let peakCount = document.getElementById("peak_count_input").value;
+            if (peakCount_select === "Specific") {
                 let empty_peaks = [];
 
                 for (let i = 1; i <= peakCount; i++) {
@@ -193,13 +217,14 @@
         form.submit();
     }
 
-      function sendGeneratePeaksForm() {
+    function sendGeneratePeaksForm() {
          if (confirm('Are you sure you want to generate new Peaks! This will overwrite your changes!')) {
              if (validateForm()) {
-                var peakCount = document.getElementById("peak_count").value;
+                var peakCount_select = document.getElementById("peak_count_select").value;
+                var peakCount = document.getElementById("peak_count_input").value;
                 var peakValues = [];
 
-                if (peakCount !== "All" && peakCount !== "") {
+                if (peakCount_select === "Specific") {
                     for (let i = 1; i <= peakCount; i++) {
                         var startValue = document.getElementById(`start_value${i}`).value;
                         var endValue = document.getElementById(`end_value${i}`).value;

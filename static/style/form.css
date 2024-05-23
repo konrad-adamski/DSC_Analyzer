@@ -10,7 +10,7 @@
 }
 
 .form-group input {
-    min-width: 160px; /* Feste Breite für Input-Felder */
+    width: 160px; /* Feste Breite für Input-Felder */
     max-width: 260px;
     margin-right: 10px; /* Optionaler Abstand rechts vom Input-Feld */
 }

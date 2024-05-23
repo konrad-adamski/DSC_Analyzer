@@ -83,11 +83,11 @@ def project_overview(project_id):
             elif request.form.get("action") == "generate_peaks":
                 measurement_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.measurements_csv))
                 df_measurement = pd.read_csv(measurement_csv_path, sep=";", index_col="Temp./°C")
-
                 find_peak_height = request.form["project_find_peak_height"]
                 find_peak_prominence = request.form["project_find_peak_prominence"]
 
-                peak_count = request.form["peak_count"]
+                peak_count_select = request.form["peak_count_select"]
+
 
                 # Bestimmung der Peaks
                 if find_peak_height and find_peak_prominence:
@@ -96,7 +96,7 @@ def project_overview(project_id):
                     project.find_peak_prominence = find_peak_prominence
                     db.session.commit()
 
-                    if peak_count == "All" or not peak_count:
+                    if peak_count_select == "All":
                         df_peak = get_peak_df(df_measurement,
                                               this_height=float(find_peak_height),
                                               this_prominence=float(find_peak_prominence))

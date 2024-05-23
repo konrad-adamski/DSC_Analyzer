@@ -43,10 +43,19 @@ def get_peak_df_by_searchareas(dframe, this_height=0.3, this_prominence=0.01, se
     for area in search_areas:
         start = int(area["start"])
         end = int(area["end"])
+        print(f"Start {start} to End {end}")
         dframe_area = dframe.loc[start:end]
+
+        print(dframe_area.head())
+        print(dframe_area.tail())
+        print("______________________________________________________________________________")
 
         for col in list(dframe_area.columns):
             data = get_series_peaks_data_single(dframe_area, col, this_height, this_prominence)
+
+            print("Data: ")
+            print(data)
+            print("______________________________________________________________________________")
 
             if df_peak.empty:
                 df_peak = pd.DataFrame(data)
@@ -57,25 +66,35 @@ def get_peak_df_by_searchareas(dframe, this_height=0.3, this_prominence=0.01, se
 
 
 def get_series_peaks_data_single(dframe, series_name, this_height=0.0, this_prominence=0.01,
-                                 prev_prominence=0.0, pre_prev_prominence=0.0):
+                                 init_prominence=None, depth=0):
+    if init_prominence is None:
+        init_prominence = this_prominence
+
+    print(f"depth: {depth}")
     data = get_series_peaks_data(dframe, series_name, this_height, this_prominence)
 
-    if this_prominence == pre_prev_prominence:  # verhindert, dass man die Funktion ewig kreist
+    max_prominence = abs(dframe[series_name].max() - dframe[series_name].min())
+    print(f"max_prominence: {max_prominence}")
+    print(f"this_prominence: {this_prominence}")
+
+    # Abbruchkriterium
+    if (this_prominence <= 0) or (depth == 20):
         return data
 
     count = len(data["Peak_Temperature"])
     if count == 0:
-        next_prominence = this_prominence - 0.001
+        next_prominence = this_prominence - init_prominence/10
         data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
-                                            this_prominence, prev_prominence)
-    elif count > 1:
-        next_prominence = this_prominence + 0.001
+                                            init_prominence, depth + 1)
+    elif count > 1 and (this_prominence < max_prominence):
+        next_prominence = this_prominence*1.3
         data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
-                                            this_prominence, prev_prominence)
+                                            init_prominence, depth + 1)
     return data
 
 
 def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
+
     if "S3" in series_name:
         dframe = -dframe
         # Finden der Peaks
