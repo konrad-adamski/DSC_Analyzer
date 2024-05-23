@@ -74,8 +74,6 @@ def get_series_peaks_data_single(dframe, series_name, this_height=0.0, this_prom
     data = get_series_peaks_data(dframe, series_name, this_height, this_prominence)
 
     max_prominence = abs(dframe[series_name].max() - dframe[series_name].min())
-    print(f"max_prominence: {max_prominence}")
-    print(f"this_prominence: {this_prominence}")
 
     # Abbruchkriterium
     if (this_prominence <= 0) or (depth == 20):

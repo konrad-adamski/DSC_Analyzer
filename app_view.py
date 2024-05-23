@@ -12,12 +12,17 @@ view_bp = Blueprint('view', __name__)
 @view_bp.route('/project_<project_id>/', methods=['GET'])
 def redirect_first(project_id):
     project = Project.query.get(project_id)
+    print(project)
     if project:
-        if project.peaks_csv:
-            peaks_csv_file_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
-            df_peak_all = pd.read_csv(peaks_csv_file_path, sep=';')
-            series = df_peak_all.loc[0, "Series"]
-            sample, segment = series.split("_")
+        if project.measurements_csv:
+            measurements_csv_file_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'],
+                                                          project.measurements_csv))
+            df_measurements = pd.read_csv(measurements_csv_file_path, sep=";", index_col=0)
+
+            column_names = list(df_measurements.columns)
+            first_series = column_names[0]
+            sample, segment = first_series.split("_")
+
             return redirect(url_for("view.sample_segment_view", project_id=project_id, sample=sample, segment=segment))
         return redirect(url_for('project.project_overview', project_id=project_id))
     return redirect(url_for('project.create_new_project'))
@@ -48,19 +53,27 @@ def sample_segment_view(project_id, sample, segment):
 
             df_peak = df_peak_all.loc[df_peak_all['Series'] == series]
 
-            # previous & next
-            rows_previous = df_peak.index.min() > 0
-            rows_next = df_peak.index.max() < df_peak_all.index.max()
+            print(df_peak)
+            print("______________")
+            if df_peak.empty:
+                print("Empty DataFrame: ", df_peak.empty)
 
-            if rows_previous:
-                idx = df_peak.index.min() - 1
-                previous_sample, previous_segment = df_peak_all["Series"].iloc[idx].split('_')
+            # current column_index
+            column_index = df_measurement.columns.get_loc(series)
+            has_previous = True if column_index > 0 else False
+            has_next = True if column_index < len(df_measurement.columns) - 1 else False
+
+            if has_previous:
+                idx = column_index - 1
+                previous_column = df_measurement.columns[idx]
+                previous_sample, previous_segment = previous_column.split("_")
                 context['previous_sample'] = previous_sample
                 context['previous_segment'] = previous_segment
-                print(previous_sample)
-            if rows_next:
-                idx = df_peak.index.max() + 1
-                next_sample, next_segment = df_peak_all["Series"].iloc[idx].split('_')
+
+            if has_next:
+                idx = column_index + 1
+                next_column = df_measurement.columns[idx]
+                next_sample, next_segment = next_column.split("_")
                 context['next_sample'] = next_sample
                 context['next_segment'] = next_segment
 

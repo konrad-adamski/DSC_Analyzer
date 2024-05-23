@@ -192,14 +192,25 @@
             let peakCount = document.getElementById("peak_count_input").value;
             if (peakCount_select === "Specific") {
                 let empty_peaks = [];
+                let invalid_peaks = [];
+
 
                 for (let i = 1; i <= peakCount; i++) {
                     let startValue = document.getElementById(`start_value${i}`).value;
                     let endValue = document.getElementById(`end_value${i}`).value;
+
+                    // Prüfen, ob Felder leer sind
                     if (startValue === "" || endValue === "") {
                         empty_peaks.push(i);
                     }
+
+                    // Umwandlung der Werte in Zahlen und Prüfung der Bedingung, dass endValue mindestens 5 größer sein muss als startValue
+                    if (parseInt(endValue) <= parseInt(startValue) + 4) {
+                        invalid_peaks.push(i);
+                    }
+
                 }
+                // Fehlermeldungen für leere Felder
                 if (empty_peaks.length > 0) {
                     if (empty_peaks.length === 1) {
                         alert(`Please fill out all required fields for Peak ${empty_peaks[0]}.`);
@@ -208,6 +219,16 @@
                     }
                     return false;
                 }
+                // Fehlermeldungen für ungültige Wertebereiche
+                if (invalid_peaks.length > 0) {
+                    if (invalid_peaks.length === 1) {
+                        alert(`End value must be at least 5 units greater than start value for Peak ${invalid_peaks[0]}.`);
+                    } else {
+                        alert(`End value must be at least 5 units greater than start value for Peaks ${invalid_peaks.join(", ")}.`);
+                    }
+                    return false;
+                }
+
             }
             return true;
         }
