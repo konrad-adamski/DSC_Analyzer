@@ -43,7 +43,7 @@
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--7-col" style="padding: 5px 2px; width: 760px;">
         <form id="pointForm" method="post" >
-              {% for num in peakCount|loop_max3 %}
+              {% for num in peakCount|loop %}
                   <p style="margin-bottom: 2px;"><b>Peak {{ num }}</b></p>
                   <div class="slider-container">
                     <label class="slider_label" for="slider_start{{ num }}">Start:</label>
@@ -76,22 +76,18 @@
         <div class="mdl-grid">
             <div class="mdl-cell">
                 <form id="tableDeleteForm" method="post">
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button" style="margin: 10px 0; min-width: 120px;" onclick="tableDeletePeaks()">Löschen</button>
+                    {% if peakCount > 0 %}
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button" style="margin: 10px 0; min-width: 120px;" onclick="tableDeletePeaks()">delete</button>
+                    {% endif %}
                     <input type="hidden" id="jsonPeak_table" name="jsonPeak">
                     <input type="hidden" name="action" value="table_delete">
                 </form>
             </div>
             <div class="mdl-cell" style="flex-grow: 1; width: auto;">
                 <form id="tableAddForm" method="post">
-                    {% if peakCount < 4 %}
-                        <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" style="float: right;" type="button" onclick="openModal()">
-                            <i class="material-icons">add</i>
-                        </button>
-                    {% else %}
-                        <button class="mdl-button mdl-js-button mdl-button--fab" style="float: right;" type="button" disabled>
-                            <i class="material-icons">add</i>
-                        </button>
-                    {% endif %}
+                    <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" style="float: right;" type="button" onclick="openModal()">
+                        <i class="material-icons">add</i>
+                    </button>
                      <input type="hidden" id="jsonPeak_table_add" name="jsonPeak">
                     <input type="hidden" name="action" value="table_add">
                     <!-- Modal Popup für die Eingaben -->

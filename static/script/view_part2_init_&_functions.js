@@ -1,4 +1,8 @@
-for (let i = 1; i <= Math.min(peakCount, 3); i++) {
+var start_colors = ["#151515", "#0B610B", "#8A2908"]
+var end_colors = ["#6E6E6E", "#31B404", "#DF7401"]
+var line_colors = ["#424242", "#088A08", "#B45F04"]
+
+for (let i = 1; i <= peakCount; i++) {
     let slider_start = document.getElementById("slider_start_" + i);
     let slider_end = document.getElementById("slider_end_" + i);
 
@@ -10,6 +14,45 @@ for (let i = 1; i <= Math.min(peakCount, 3); i++) {
 
     slider_end.value = jsonPeak[i]["End_Temperature"];
     input_end.value = jsonPeak[i]["End_Temperature"];
+
+    // Farben
+    let modulo = i % 3;
+    let startColor = start_colors[modulo];
+    let endColor = end_colors[modulo];
+    // Fügen Sie CSS-Regeln dynamisch hinzu
+    addSliderThumbStyle(i, startColor, endColor);
+
+    // Fügen Sie die dynamisch generierten Klassen hinzu
+    slider_start.classList.add(`slider-start${i}`);
+    slider_end.classList.add(`slider-end${i}`);
+
+}
+
+
+function addSliderThumbStyle(index, startColor, endColor) {
+    const styleId = 'dynamic-slider-styles';
+    let styleElement = document.getElementById(styleId);
+
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = styleId;
+        document.head.appendChild(styleElement);
+    }
+
+    // Füge neue Regeln dem bestehenden Style-Element hinzu
+    styleElement.textContent += `
+        .slider-start${index}::-webkit-slider-thumb {
+            background: ${startColor};
+        }
+        .slider-start${index}::-moz-range-thumb {
+            background: ${startColor};
+        }
+        .slider-end${index}::-webkit-slider-thumb {
+            background: ${endColor};
+        }
+        .slider-end${index}::-moz-range-thumb {
+            background: ${endColor};
+        }`;
 }
 
 

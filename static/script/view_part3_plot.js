@@ -1,6 +1,5 @@
 jsonMeasurement.y = jsonMeasurement.y.map(yWert => (yWert+1) * 100000);
 
-
 // Erstellung des Bokeh-Plots ------------------------------------------------------------------------------------------
 var plot = Bokeh.Plotting.figure({
     width: 700,
@@ -31,42 +30,29 @@ plot.line({field: "x"}, {field: "y"}, {source: lineSource, line_width: 2, line_c
 
 
 // Erstellen der Datenquellen
-var source1 = new Bokeh.ColumnDataSource({
-    data: {
-        x: json_get_x_by(1, jsonPeak),
-        y: get_y(json_get_x_by(1, jsonPeak), jsonMeasurement)
-    }
+var sources = {};
+
+Object.keys(jsonPeak).forEach(key => {
+    sources[key] = new Bokeh.ColumnDataSource({
+        data: {
+            x: json_get_x_by(key, jsonPeak),
+            y: get_y(json_get_x_by(key, jsonPeak), jsonMeasurement)
+        }
+    });
+    console.log("Datenquelle erstellt für Key:", key, "mit Daten:", sources[key].data);
 });
 
-var source2 = new Bokeh.ColumnDataSource({
-    data: {
-        x: json_get_x_by(2, jsonPeak),
-        y: get_y(json_get_x_by(2, jsonPeak), jsonMeasurement)
-    }
+Object.keys(sources).forEach(key => {
+    let modulo = key % 3;
+    console.log("Modulo:", modulo);
+    let source = sources[key];
+    plot.line({field: "x"}, {field: "y"}, {source: source, line_width: 2, line_color: line_colors[modulo]});
+    plot.circle({field: "x"}, {field: "y"}, {source: source, size: 10,
+        color: [start_colors[modulo], end_colors[modulo]]});
+
+
+    console.log("Grafik hinzugefügt für Key:", key);
 });
-
-var source3 = new Bokeh.ColumnDataSource({
-    data: {
-        x: json_get_x_by(3, jsonPeak),
-        y: get_y(json_get_x_by(3, jsonPeak), jsonMeasurement)
-    }
-});
-
-
-if (source1.data["x"].length > 0) {
-    plot.circle({field: "x"}, {field: "y"}, {source: source1, size: 10, color: ["#0B610B", "#31B404"]});
-    plot.line({field: "x"}, {field: "y"}, {source: source1, line_width:2, line_color:"#088A08"});
-}
-
-if (source2.data["x"].length > 0) {
-    plot.circle({field: "x"}, {field: "y"}, {source: source2, size: 10, color: ["#8A2908", "#DF7401"]});
-    plot.line({field: "x"}, {field: "y"}, {source: source2, line_width:2, line_color:"#B45F04"});
-}
-if (source3.data["x"].length > 0) {
-    plot.circle({field: "x"}, {field: "y"}, {source: source3, size: 10, color: ["#151515", "#6E6E6E"]});
-    plot.line({field: "x"}, {field: "y"}, {source: source3, line_width:2, line_color:"#424242"});
-}
-
 
 // Durchlaufen des jsonPeak-Objekts
 for (let key in jsonPeak) {
@@ -74,6 +60,7 @@ for (let key in jsonPeak) {
     let peak_y = getNearestY(peakTemperature, jsonMeasurement)
     plot.x([peakTemperature], [peak_y], { size: 10, color: '#3399ff', line_width: 2});
 }
+
 
 
 // Definieren der Tooltip-Nachrichts
@@ -110,19 +97,12 @@ function updatePoint(send_boolean, sliderId) {
         jsonPeak[index]["End_Temperature"] = slider.value
     }
 
-    if (index === "1") {
-        source1.data.x = json_get_x_by(1, jsonPeak);
-        source1.data.y = get_y(json_get_x_by(1, jsonPeak), jsonMeasurement);
-        source1.change.emit();
-    } else if (index === "2") {
-        source2.data.x = json_get_x_by(2, jsonPeak);
-        source2.data.y = get_y(json_get_x_by(2, jsonPeak), jsonMeasurement);
-        source2.change.emit();
-    } else if (index === "3") {
-        source3.data.x = json_get_x_by(3, jsonPeak);
-        source3.data.y = get_y(json_get_x_by(3, jsonPeak), jsonMeasurement);
-        source3.change.emit();
-    }
+    // Aktualisieren des Plots
+    let source = sources[index];
+    source.data.x = json_get_x_by(index, jsonPeak);
+    source.data.y = get_y(json_get_x_by(index, jsonPeak), jsonMeasurement);
+    source.change.emit();
+
 
     // Aktualisieren des Textfeldes
     input.value = slider.value
