@@ -104,7 +104,7 @@
                      </div>
                     <div class="form-group">
                         <label for="find_peak_prominence">Peak Prominence:</label>
-                        <input class="mdl-js-textfield" type="number" id="find_peak_prominence" name="project_find_peak_prominence" min="0" max="1" step="0.001" value="{{ project.find_peak_prominence}}">
+                        <input class="mdl-js-textfield" type="number" id="find_peak_prominence" name="project_find_peak_prominence" min="0" max="100" step="0.01" value="{{ project.find_peak_prominence}}">
                         <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" type="button" id="peak_prominence_info" onmouseover="get_bubble(this.id, true, 'prominence')"  onmouseout="get_bubble(this.id, false)">?</button>
                         <div id="peak_prominence_info_bubble" style="display: none; position: absolute; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>
 
@@ -277,7 +277,7 @@
         if (show) {
             if (type === "prominence") {
                 // Setzen des Inhalts der Informationsblase, wenn sie angezeigt werden soll
-                bubble.innerHTML = "The prominence of a peak measures how much the peak stands out due to its intrinsic height<br>and its location relative to other peaks.<br>More peaks are found at a value of 0.001 and fewer peaks at 0.1.";
+                bubble.innerHTML = "The prominence of a peak measures how much the peak stands out due to its intrinsic height<br>and its location relative to other peaks.<br>More peaks are found with small values like of 0.001 and fewer peaks greater values like at 0.5.";
             } else if (type === "height") {
                 bubble.innerHTML = "This is the limit on the DSC axis, regardless of the +/- sign.<br>In the case of 0.3, only curve data above this height for segment 5<br>or below -0.3 for segment 3 (cooling down) is taken into account!";
             } else {

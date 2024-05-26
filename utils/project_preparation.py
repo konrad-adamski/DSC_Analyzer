@@ -2,6 +2,7 @@ import os
 import re
 from io import StringIO
 
+import numpy as np
 import pandas as pd
 from flask import current_app
 
@@ -74,6 +75,13 @@ def get_info_df(info_text):
     series_relevant_columns = unique_counts[unique_counts > 1]
     info_df = info_df[series_relevant_columns.index.tolist()]
 
+    # 6 Anpassung der Spaltennamen
+    info_df.columns = info_df.columns.str.lower()
+    info_df = info_df.rename(columns=replace_slash)
+
+    # Konvertiere 'sample mass_mg' zu numerischen Werten, ignoriere Fehler
+    info_df['sample mass_mg'] = pd.to_numeric(info_df['sample mass_mg'], errors='coerce')
+
     return info_df
 
 
@@ -82,9 +90,15 @@ def get_measurement_df(measurements_text, info_df):
     # Dataframe
     measurements_df = pd.read_csv(StringIO(measurements_text), sep=';', index_col=0)
 
+    dsc_type = "unknown"
+    if "mW/mg" in measurements_df.columns[0]:
+        dsc_type = "mW/mg"
+    elif "mW" in measurements_df.columns[0]:
+        dsc_type = "mW"
+
     # 1) Anpassung der Spaltennamen
     num_cols = len(info_df)
-    new_columns = [info_df.at[i, 'SAMPLE'] + '_' + info_df.at[i, 'SEGMENT'] for i in range(num_cols)]
+    new_columns = [info_df.at[i, 'sample'] + '_' + info_df.at[i, 'segment'] for i in range(num_cols)]
     new_columns = [col.replace("/5", "") for col in new_columns]
     measurements_df.columns = new_columns
 
@@ -97,6 +111,23 @@ def get_measurement_df(measurements_text, info_df):
     columns_s1 = measurements_df.filter(like='_S1').columns
 
     measurements_df.drop(columns=columns_s1, inplace=True)
+
+    # 4) Anpassung der Werte in mW
+
+    measurements_df = measurements_df.apply(pd.to_numeric, errors='coerce')
+
+    try:
+        if dsc_type == "mW/mg":
+            for column in measurements_df.columns:
+                sample, _ = column.split('_')  # Sample und Segment ID extrahieren
+                mass_mg_value = info_df.loc[info_df["sample"] == sample, "sample mass_mg"].iloc[0]
+                measurements_df.loc[:, column] *= mass_mg_value
+            dsc_type = "mW"
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+
     return measurements_df
 
 
@@ -142,3 +173,9 @@ def dict_to_dataframe(dictionary, ignore_keys=None):
     # Filtern der Schlüssel, die ignoriert werden sollen
     filtered_dict = {key: values for key, values in dictionary.items() if key not in ignore_keys}
     return pd.DataFrame(filtered_dict)
+
+
+# Hilfsfunktionen ----------------------------------------------------
+
+def replace_slash(column_name):
+    return re.sub(r'\s*/\s*', '_', column_name.lower())

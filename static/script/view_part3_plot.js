@@ -5,17 +5,17 @@ var plot = Bokeh.Plotting.figure({
     width: 700,
     height: 420,
     x_axis_label: "Temperatur in °C",
-    y_axis_label: "DSC in mW/mg",
+    y_axis_label: "DSC in mW",
     x_range: [-50, 300]
 });
 
 plot.xaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 50 }); // 50 als Intervall festlegen
 // Ändern der y-Achsenticks
-plot.yaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 2000 }); // 10,000 als Intervall festlegen
+plot.yaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 50000 }); // 10,000 als Intervall festlegen
 plot.yaxis.formatter =new Bokeh.CustomJSTickFormatter({
     args: {},
     code: `
-        return ((tick / 100000)-1).toFixed(2);
+        return ((tick / 100000)-1).toFixed(1);
     `
 });
 
