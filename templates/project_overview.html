@@ -98,7 +98,7 @@
                     </div>
                      <div class="form-group">
                         <label for="find_peak_height">Peak Search Height:</label>
-                        <input class="mdl-js-textfield" type="number" id="find_peak_height" name="project_find_peak_height" min="0" max="1" step="0.01" value="{{ project.find_peak_height}}">
+                        <input class="mdl-js-textfield" type="number" id="find_peak_height" name="project_find_peak_height" min="0" max="100" step="0.01" value="{{ project.find_peak_height}}">
                         <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored" type="button" id="peak_height_info" onmouseover="get_bubble(this.id, true, 'height')"  onmouseout="get_bubble(this.id, false)">?</button>
                         <div id="peak_height_info_bubble" style="display: none; position: absolute; padding: 10px; background-color: white; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></div>
                      </div>
