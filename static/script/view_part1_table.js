@@ -11,8 +11,8 @@ function getRowTable(rowData, areaClass) {
         if (rowData.hasOwnProperty(key)) {
             const row = document.createElement("tr");
             row.innerHTML = `<td>${key}</td>
-                             <td>${rowData[key]["Peak_Temperature"]}</td>
-                             <td class="${areaClass}">${rowData[key]["Area"]}</td>`;
+                             <td>${rowData[key]["T_melt [°C]"]}</td>
+                             <td class="${areaClass}">${rowData[key]["dH_melt [mJ]"]}</td>`;
             tableBody.appendChild(row);
         }
     }

@@ -9,11 +9,11 @@ for (let i = 1; i <= peakCount; i++) {
     let input_start = document.getElementById("slider_start_" + i + "_text");
     let input_end = document.getElementById("slider_end_" + i + "_text");
 
-    slider_start.value = jsonPeak[i]["Start_Temperature"];
-    input_start.value = jsonPeak[i]["Start_Temperature"];
+    slider_start.value = jsonPeak[i]["T1 (Onset) [°C]"];
+    input_start.value = jsonPeak[i]["T1 (Onset) [°C]"];
 
-    slider_end.value = jsonPeak[i]["End_Temperature"];
-    input_end.value = jsonPeak[i]["End_Temperature"];
+    slider_end.value = jsonPeak[i]["T2 (Offset) [°C]"];
+    input_end.value = jsonPeak[i]["T2 (Offset) [°C]"];
 
     // Farben
     let modulo = i % 3;
@@ -63,8 +63,8 @@ function addSliderThumbStyle(index, startColor, endColor) {
  function json_get_x(data) {
      let result = [];
      for (let key in data) {
-         result.push(data[key]["Start_Temperature"]);
-         result.push(data[key]["End_Temperature"]);
+         result.push(data[key]["T1 (Onset) [°C]"]);
+         result.push(data[key]["T2 (Offset) [°C]"]);
      }
      return result;
  }
@@ -73,8 +73,8 @@ function addSliderThumbStyle(index, startColor, endColor) {
      key = String(key)
      if (key in data) { // Überprüfen, ob der Schlüssel im JSON-Objekt vorhanden ist
          let result = [];
-         result.push(data[key]["Start_Temperature"]);
-         result.push(data[key]["End_Temperature"]);
+         result.push(data[key]["T1 (Onset) [°C]"]);
+         result.push(data[key]["T2 (Offset) [°C]"]);
          return result;
      } else {
          return []; // Leere Liste zurückgeben, wenn der Schlüssel nicht vorhanden ist

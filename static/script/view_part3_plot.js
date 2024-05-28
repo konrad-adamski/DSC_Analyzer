@@ -1,4 +1,6 @@
-jsonMeasurement.y = jsonMeasurement.y.map(yWert => (yWert+1) * 100000);
+let y_factor = 100000;
+
+jsonMeasurement.y = jsonMeasurement.y.map(yWert => (yWert+100) * y_factor);
 
 // Erstellung des Bokeh-Plots ------------------------------------------------------------------------------------------
 var plot = Bokeh.Plotting.figure({
@@ -11,11 +13,11 @@ var plot = Bokeh.Plotting.figure({
 
 plot.xaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 50 }); // 50 als Intervall festlegen
 // Ändern der y-Achsenticks
-plot.yaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 50000 }); // 10,000 als Intervall festlegen
+plot.yaxis.ticker = new Bokeh.SingleIntervalTicker({ interval: 0.5*y_factor }); // 10,000 als Intervall festlegen
 plot.yaxis.formatter =new Bokeh.CustomJSTickFormatter({
     args: {},
     code: `
-        return ((tick / 100000)-1).toFixed(1);
+        return ((tick / y_factor)-100).toFixed(1);
     `
 });
 
@@ -56,7 +58,7 @@ Object.keys(sources).forEach(key => {
 
 // Durchlaufen des jsonPeak-Objekts
 for (let key in jsonPeak) {
-    let peakTemperature = jsonPeak[key]["Peak_Temperature"];
+    let peakTemperature = jsonPeak[key]["T_melt [°C]"];
     let peak_y = getNearestY(peakTemperature, jsonMeasurement)
     plot.x([peakTemperature], [peak_y], { size: 10, color: '#3399ff', line_width: 2});
 }
@@ -92,9 +94,9 @@ function updatePoint(send_boolean, sliderId) {
     let index = sliderId.split('_')[2];
 
     if (type === "start"){
-        jsonPeak[index]["Start_Temperature"] = slider.value
+        jsonPeak[index]["T1 (Onset) [°C]"] = slider.value
     } else {
-        jsonPeak[index]["End_Temperature"] = slider.value
+        jsonPeak[index]["T2 (Offset) [°C]"] = slider.value
     }
 
     // Aktualisieren des Plots

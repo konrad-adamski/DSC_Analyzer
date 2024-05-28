@@ -82,6 +82,9 @@ def get_info_df(info_text):
     # Konvertiere 'sample mass_mg' zu numerischen Werten, ignoriere Fehler
     info_df['sample mass_mg'] = pd.to_numeric(info_df['sample mass_mg'], errors='coerce')
 
+    # Extrahieren der Heizrate
+    info_df['heat_rate'] = info_df['range'].apply(extract_heat_rate)
+
     return info_df
 
 
@@ -127,6 +130,9 @@ def get_measurement_df(measurements_text, info_df):
     except Exception as e:
         print(f"Error: {e}")
 
+    # 5) Zeit-Spalte einfügen
+    heating_rate_per_minute = info_df["heat_rate"][0]
+    measurements_df['Time [sec]'] = get_time_from_temperatures(measurements_df, heating_rate_per_minute)
 
     return measurements_df
 
@@ -179,3 +185,15 @@ def dict_to_dataframe(dictionary, ignore_keys=None):
 
 def replace_slash(column_name):
     return re.sub(r'\s*/\s*', '_', column_name.lower())
+
+def extract_heat_rate(text):
+    match = re.search(r'(\d+\.?\d*)(?=\(K/min\))', text)
+    return float(match.group(1)) if match else None
+
+
+def get_time_from_temperatures(df, heating_rate_per_minute=20):
+    heating_rate_per_second = heating_rate_per_minute / 60
+    start_temp = df.index[0]
+    time_seconds = [(temp - start_temp) / heating_rate_per_second for temp in df.index]
+    return time_seconds
+
