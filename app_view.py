@@ -53,11 +53,6 @@ def sample_segment_view(project_id, sample, segment):
 
             df_peak = df_peak_all.loc[df_peak_all['Series'] == series]
 
-            print(df_peak)
-            print("______________")
-            if df_peak.empty:
-                print("Empty DataFrame: ", df_peak.empty)
-
             # current column_index
             column_index = df_measurement.columns.get_loc(series)
             has_previous = True if column_index > 0 else False
@@ -77,53 +72,53 @@ def sample_segment_view(project_id, sample, segment):
                 context['next_sample'] = next_sample
                 context['next_segment'] = next_segment
 
-            if request.method == 'GET':
-                # DataFrame in JSON konvertieren
-                df_peak.reset_index(drop=True, inplace=True)
-                df_peak.index += 1  # Für Zuordnung im Plot
-                json_peak = df_peak.to_json(orient="index", indent=4)
-                print(df_peak)
-                print(json_peak)
+            # DataFrame in JSON konvertieren
+            df_peak.reset_index(drop=True, inplace=True)
+            df_peak.index += 1  # Für Zuordnung im Plot
+            json_peak = df_peak.to_json(orient="index", indent=4)
 
-            else:  # request.method == 'POST':
+            if request.method == 'POST':
                 jsonPeak_string = request.form.get('jsonPeak')
                 df_peak = pd.read_json(StringIO(jsonPeak_string), orient="index")
 
-                if request.form.get("action"):
-                    if request.form.get("action") == "plot_edit":  # die Punkte wurden verändert
-                        # Neue Punkte zuweisen und neue Flächen berechnen
-                        df_peak['T1 (Onset) [°C]'] = (df_peak['T1 (Onset) [°C]']
-                                                        .apply(lambda x: get_nearest_value(x, temperature_list)))
-                        df_peak['T2 (Offset) [°C]'] = (df_peak['T2 (Offset) [°C]']
-                                                      .apply(lambda x: get_nearest_value(x, temperature_list)))
-                        area_calc(df_peak, df_measurement,
-                                  series)  # anhand der neuen Punkte werden die Flächen berechnet
-                    elif request.form.get("action") == "table_delete":
-                        df_peak.reset_index(drop=True, inplace=True)
-                        df_peak.index += 1
+                onset_plausible = (df_peak['T1 (Onset) [°C]'] < df_peak['T_melt [°C]']).all()
+                offset_plausible = (df_peak['T2 (Offset) [°C]'] > df_peak['T_melt [°C]']).all()
 
-                    elif request.form.get("action") == "table_add":
-                        min_temperature = float(request.form.get("min_temperature")) if request.form.get(
-                            "min_temperature") else 0
-                        max_temperature = float(request.form.get("max_temperature")) if request.form.get(
-                            "max_temperature") else 300
+                if onset_plausible and offset_plausible:
 
-                        min_temperature = get_nearest_value(min_temperature, temperature_list)
-                        max_temperature = get_nearest_value(max_temperature, temperature_list)
+                    if request.form.get("action"):
+                        if request.form.get("action") == "plot_edit":  # die Punkte wurden verändert
+                            # Neue Punkte zuweisen und neue Flächen berechnen
+                            df_peak['T1 (Onset) [°C]'] = (
+                                df_peak['T1 (Onset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
+                            df_peak['T2 (Offset) [°C]'] = (
+                                df_peak['T2 (Offset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
+                            area_calc(df_peak, df_measurement,
+                                      series)  # anhand der neuen Punkte werden die Flächen berechnet
+                        elif request.form.get("action") == "table_delete":
+                            df_peak.reset_index(drop=True, inplace=True)
+                            df_peak.index += 1
 
-                        df_peak_new = get_peak_df_for_searcharea(df_measurement.loc[:, [series]],
-                                                                 this_height=0, this_prominence=0.01,
-                                                                 start=min_temperature, end=max_temperature)
+                        elif request.form.get("action") == "table_add":
+                            min_temperature = float(request.form.get("min_temperature")) if request.form.get(
+                                "min_temperature") else 0
+                            max_temperature = float(request.form.get("max_temperature")) if request.form.get(
+                                "max_temperature") else 300
 
-                        peak_df_area_calc(df_peak_new, df_measurement)
-                        df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
+                            min_temperature = get_nearest_value(min_temperature, temperature_list)
+                            max_temperature = get_nearest_value(max_temperature, temperature_list)
 
-                    update_peaks_csv(df_peak_all, df_peak, project, series)
+                            df_peak_new = get_peak_df_for_searcharea(df_measurement.loc[:, [series]],
+                                                                     this_height=0, this_prominence=0.01,
+                                                                     start=min_temperature, end=max_temperature)
 
-                json_peak = df_peak.to_json(orient="index", indent=4)
-                print(df_peak)
+                            peak_df_area_calc(df_peak_new, df_measurement)
+                            df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
 
-            print()
+                        update_peaks_csv(df_peak_all, df_peak, project, series)
+
+                    json_peak = df_peak.to_json(orient="index", indent=4)
+
             context["project_id"] = project_id
             context["sample"] = sample
             context["segment"] = segment[1:]

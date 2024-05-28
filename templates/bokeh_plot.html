@@ -48,12 +48,12 @@
                   <div class="slider-container">
                     <label class="slider_label" for="slider_start{{ num }}">Onset:</label>
                     <input class ="slider slider_start{{ num }}" type="range" id="slider_start_{{ num }}" name="sliderstart_{{ num }}" value="100" min="-50" max="300" step="0.00001" oninput="updatePoint(false, this.id)" onmouseup="updatePoint(true, this.id)">
-                    <input class="slider-input" type="number" id="slider_start_{{ num }}_text" name = "start_{{ num }}" step="0.1" min="-50" max="300" onchange="updateSlider('slider_start_{{ num }}');">
+                    <input class="slider-input" type="number" id="slider_start_{{ num }}_text" name = "start_{{ num }}" step="1" min="-50" max="300" onchange="updateSlider('slider_start_{{ num }}');">
                 </div>
                 <div class="slider-container">
                     <label class="slider_label" for="slider_end_{{ num }}">Offset:</label>
                     <input class ="slider slider_end{{ num }}" type="range" id="slider_end_{{ num }}" name="sliderend_{{ num }}" value="100" min="-50" max="300" step="0.00001" oninput="updatePoint(false, this.id)" onmouseup="updatePoint(true, this.id)">
-                    <input class="slider-input" type="number" id="slider_end_{{ num }}_text" name = "end_{{ num }}" step="0.1" min="-50" max="300" onchange="updateSlider('slider_end_{{ num }}');">
+                    <input class="slider-input" type="number" id="slider_end_{{ num }}_text" name = "end_{{ num }}" step="1" min="-50" max="300" onchange="updateSlider('slider_end_{{ num }}');">
                 </div>
               {% endfor %}
                 <input type="hidden" name="jsonPeak" id="jsonPeak"><!-- Wird im POST übergeben! -->
