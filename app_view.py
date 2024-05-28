@@ -61,7 +61,7 @@ def sample_segment_view(project_id, sample, segment):
             # current column_index
             column_index = df_measurement.columns.get_loc(series)
             has_previous = True if column_index > 0 else False
-            has_next = True if column_index < len(df_measurement.columns) - 1 else False
+            has_next = True if column_index < len(df_measurement.columns) - 2 else False
 
             if has_previous:
                 idx = column_index - 1
@@ -92,9 +92,9 @@ def sample_segment_view(project_id, sample, segment):
                 if request.form.get("action"):
                     if request.form.get("action") == "plot_edit":  # die Punkte wurden verändert
                         # Neue Punkte zuweisen und neue Flächen berechnen
-                        df_peak['Start_Temperature'] = (df_peak['Start_Temperature']
+                        df_peak['T1 (Onset) [°C]'] = (df_peak['T1 (Onset) [°C]']
                                                         .apply(lambda x: get_nearest_value(x, temperature_list)))
-                        df_peak['End_Temperature'] = (df_peak['End_Temperature']
+                        df_peak['T2 (Offset) [°C]'] = (df_peak['T2 (Offset) [°C]']
                                                       .apply(lambda x: get_nearest_value(x, temperature_list)))
                         area_calc(df_peak, df_measurement,
                                   series)  # anhand der neuen Punkte werden die Flächen berechnet
@@ -123,6 +123,7 @@ def sample_segment_view(project_id, sample, segment):
                 json_peak = df_peak.to_json(orient="index", indent=4)
                 print(df_peak)
 
+            print()
             context["project_id"] = project_id
             context["sample"] = sample
             context["segment"] = segment[1:]
@@ -157,7 +158,7 @@ def update_peaks_csv(all_peaks_dframe, series_peaks_df, project, series):
     all_peaks_dframe['Segment'] = all_peaks_dframe['Series'].str.extract('_(S\d+)')  # Extrahiert dem Suffix
 
     # Sortieren des DataFrames zuerst nach Sample_Numb, dann Segment und zuletzt nach Peak_Temperature
-    all_peaks_dframe = all_peaks_dframe.sort_values(by=['Sample_Numb', 'Segment', 'Peak_Temperature'])
+    all_peaks_dframe = all_peaks_dframe.sort_values(by=['Sample_Numb', 'Segment', 'T_melt [°C]'])
 
     # Entfernen der temporären Spalten
     all_peaks_dframe.drop(columns=['Sample_Numb', 'Segment'], inplace=True)

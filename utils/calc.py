@@ -9,9 +9,13 @@ this_prominence = 0.01 # [0.001 (mehr peaks) - 0.1 (weniger peaks)]
 
 
 def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
-    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+                                    "Duration [sec]", "dH_melt [mJ]"])
 
-    for col in list(dframe.columns):
+    all_columns = list(dframe.columns)
+    data_columns = [element for element in all_columns if "Time" not in element]
+
+    for col in data_columns:
         data = get_series_peaks_data(dframe, col, this_height, this_prominence)
 
         if df_peak.empty:
@@ -23,10 +27,14 @@ def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
 
 
 def get_peak_df_for_searcharea(dframe, this_height=0.3, this_prominence=0.01, start=0, end=1):
-    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+                                    "Duration [sec]", "dH_melt [mJ]"])
     dframe_area = dframe.loc[start:end]
 
-    for col in list(dframe_area.columns):
+    all_columns = list(dframe.columns)
+    data_columns = [element for element in all_columns if "Time" not in element]
+
+    for col in data_columns:
         data = get_series_peaks_data_single(dframe_area, col, this_height, this_prominence)
 
         if df_peak.empty:
@@ -38,24 +46,19 @@ def get_peak_df_for_searcharea(dframe, this_height=0.3, this_prominence=0.01, st
 
 
 def get_peak_df_by_searchareas(dframe, this_height=0.3, this_prominence=0.01, search_areas=None):
-    df_peak = pd.DataFrame(columns=["Series", "Peak_Temperature", "Start_Temperature", "End_Temperature", "Area"])
+    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+                                    "Duration [sec]", "dH_melt [mJ]"])
+
+    all_columns = list(dframe.columns)
+    data_columns = [element for element in all_columns if "Time" not in element]
 
     for area in search_areas:
         start = int(area["start"])
         end = int(area["end"])
-        print(f"Start {start} to End {end}")
         dframe_area = dframe.loc[start:end]
 
-        print(dframe_area.head())
-        print(dframe_area.tail())
-        print("______________________________________________________________________________")
-
-        for col in list(dframe_area.columns):
+        for col in data_columns:
             data = get_series_peaks_data_single(dframe_area, col, this_height, this_prominence)
-
-            print("Data: ")
-            print(data)
-            print("______________________________________________________________________________")
 
             if df_peak.empty:
                 df_peak = pd.DataFrame(data)
@@ -70,7 +73,6 @@ def get_series_peaks_data_single(dframe, series_name, this_height=0.0, this_prom
     if init_prominence is None:
         init_prominence = this_prominence
 
-    print(f"depth: {depth}")
     data = get_series_peaks_data(dframe, series_name, this_height, this_prominence)
 
     max_prominence = abs(dframe[series_name].max() - dframe[series_name].min())
@@ -79,20 +81,19 @@ def get_series_peaks_data_single(dframe, series_name, this_height=0.0, this_prom
     if (this_prominence <= 0) or (depth == 20):
         return data
 
-    count = len(data["Peak_Temperature"])
+    count = len(data["T_melt [°C]"])
     if count == 0:
-        next_prominence = this_prominence - init_prominence/10
+        next_prominence = this_prominence - init_prominence / 10
         data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
                                             init_prominence, depth + 1)
     elif count > 1 and (this_prominence < max_prominence):
-        next_prominence = this_prominence*1.3
+        next_prominence = this_prominence * 1.3
         data = get_series_peaks_data_single(dframe, series_name, this_height, next_prominence,
                                             init_prominence, depth + 1)
     return data
 
 
 def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=0.01):
-
     if "S3" in series_name:
         dframe = -dframe
         # Finden der Peaks
@@ -190,38 +191,53 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
     end_points_temperature = dframe.index[end_points]
 
     return {"Series": series_name,
-            'Peak_Temperature': peaks_temperature,
-            'Start_Temperature': start_points_temperature,
-            'End_Temperature': end_points_temperature,
-            'Area': np.NaN}
+            'T_melt [°C]': peaks_temperature,
+            'T1 (Onset) [°C]': start_points_temperature,
+            'T2 (Offset) [°C]': end_points_temperature,
+            'Duration [sec]': np.NaN,
+            'dH_melt [mJ]': np.NaN}
 
 
 def peak_df_area_calc(peak_dframe, measurement_dframe):
-    for col in list(measurement_dframe.columns):
+    all_columns = list(measurement_dframe.columns)
+    data_columns = [element for element in all_columns if "Time" not in element]
+
+    for col in data_columns:
         area_calc(peak_dframe, measurement_dframe, col)
 
 
 def area_calc(peak_dframe, measurement_dframe, series_name):
     areas = []
+    durations = []
     for i, row in peak_dframe[peak_dframe["Series"] == series_name].iterrows():
-        start_index = measurement_dframe.index.get_loc(row['Start_Temperature'])
-        end_index = measurement_dframe.index.get_loc(row['End_Temperature'])
+        onset = row['T1 (Onset) [°C]']
+        offset = row['T2 (Offset) [°C]']
 
-        this_x = measurement_dframe.index[start_index:end_index]
+        start_index = measurement_dframe.index.get_loc(onset)
+        end_index = measurement_dframe.index.get_loc(offset)
+
+        y_values = measurement_dframe[series_name].iloc[start_index:end_index]
+
+        x_time_values = measurement_dframe['Time [sec]'].iloc[start_index:end_index]
 
         # Bereich unterhalb des Peaks
-        area_below_peak = np.trapz(measurement_dframe[series_name].iloc[start_index:end_index], x=this_x)
+        area_below_peak = np.trapz(y_values, x=x_time_values)
 
         # Bereich zwischen der Linie von Start- und Endpunkt und dem Bereich unterhalb des Peaks
-        line_values = np.linspace(measurement_dframe[series_name].iloc[start_index],
-                                  measurement_dframe[series_name].iloc[end_index], end_index - start_index)
-        area_below_line = np.trapz(line_values, x=this_x)
+        line_values = np.linspace(y_values.iloc[0], y_values.iloc[-1], len(y_values))
+        area_below_line = np.trapz(line_values, x=x_time_values)
 
         # Gesuchte Fläche (Integral bis zur Linie)
-        total_area = area_below_peak - area_below_line
-        areas.append(total_area)
+        peak_area = round(abs(area_below_peak - area_below_line), 2)
+        areas.append(peak_area)
 
-    peak_dframe.loc[peak_dframe["Series"] == series_name, "Area"] = areas
+        # Dauer
+        duration = x_time_values.iloc[-1] - x_time_values.iloc[0]
+        durations.append(duration)
+
+    peak_dframe.loc[peak_dframe["Series"] == series_name, "dH_melt [mJ]"] = areas
+    peak_dframe.loc[peak_dframe["Series"] == series_name, "Duration [sec]"] = durations
+
     return True
 
 
