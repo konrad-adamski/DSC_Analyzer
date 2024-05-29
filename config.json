@@ -2,6 +2,6 @@
     "default": {
         "find_peak_height": 6.0,
         "find_peak_prominence": 0.15,
-        "max_peak_numb": 10
+        "max_peak_numb": 12
     }
 }
