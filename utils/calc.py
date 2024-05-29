@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from scipy.signal import find_peaks
 
+from utils.project_preparation import get_time_from_temperatures
+
 """
 this_height = 0.3  # Grenze auf der y-Achse (0-1) 
 this_prominence = 0.01 # [0.001 (mehr peaks) - 0.1 (weniger peaks)]
@@ -9,7 +11,7 @@ this_prominence = 0.01 # [0.001 (mehr peaks) - 0.1 (weniger peaks)]
 
 
 def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
-    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+    df_peak = pd.DataFrame(columns=["File", "Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
                                     "Duration [sec]", "dH_melt [mJ]"])
 
     all_columns = list(dframe.columns)
@@ -27,7 +29,7 @@ def get_peak_df(dframe, this_height=0.3, this_prominence=0.01):
 
 
 def get_peak_df_for_searcharea(dframe, this_height=0.3, this_prominence=0.01, start=0, end=1):
-    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+    df_peak = pd.DataFrame(columns=["File", "Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
                                     "Duration [sec]", "dH_melt [mJ]"])
     dframe_area = dframe.loc[start:end]
 
@@ -46,7 +48,7 @@ def get_peak_df_for_searcharea(dframe, this_height=0.3, this_prominence=0.01, st
 
 
 def get_peak_df_by_searchareas(dframe, this_height=0.3, this_prominence=0.01, search_areas=None):
-    df_peak = pd.DataFrame(columns=["Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
+    df_peak = pd.DataFrame(columns=["File", "Series", "T_melt [°C]", "T1 (Onset) [°C]", "T2 (Offset) [°C]",
                                     "Duration [sec]", "dH_melt [mJ]"])
 
     all_columns = list(dframe.columns)
@@ -190,7 +192,8 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
     start_points_temperature = dframe.index[improved_start_points]
     end_points_temperature = dframe.index[end_points]
 
-    return {"Series": series_name,
+    return {"File": np.NaN,
+            "Series": series_name,
             'T_melt [°C]': peaks_temperature,
             'T1 (Onset) [°C]': start_points_temperature,
             'T2 (Offset) [°C]': end_points_temperature,
@@ -198,18 +201,29 @@ def get_series_peaks_data(dframe, series_name, this_height=0.3, this_prominence=
             'dH_melt [mJ]': np.NaN}
 
 
-def peak_df_area_calc(peak_dframe, measurement_dframe):
+def peak_df_area_calc(peak_dframe, measurement_dframe, info_dframe):
     all_columns = list(measurement_dframe.columns)
     data_columns = [element for element in all_columns if "Time" not in element]
 
     for col in data_columns:
-        area_calc(peak_dframe, measurement_dframe, col)
+        area_calc(peak_dframe, measurement_dframe, info_dframe, col)
 
 
-def area_calc(peak_dframe, measurement_dframe, series_name):
+def area_calc(peak_dframe, measurement_dframe, info_dframe, series_name):
+    sample, segment = series_name.split("_")
+    sample_filter = (info_dframe["sample"] == sample)
+    segment_filter = info_dframe["segment"].str.contains(segment + "/")
+
+    # Heizrate (temporär)
+    heat_rate_per_minute = info_dframe.loc[segment_filter & sample_filter, "heat_rate"].iloc[0]
+    measurement_dframe['Time [sec]'] = get_time_from_temperatures(measurement_dframe, heat_rate_per_minute)
+
     areas = []
     durations = []
     for i, row in peak_dframe[peak_dframe["Series"] == series_name].iterrows():
+        if pd.isna(row['File']):
+            peak_dframe.loc[i, 'File'] = info_dframe.loc[segment_filter & sample_filter, "file"].iloc[0]
+
         onset = row['T1 (Onset) [°C]']
         offset = row['T2 (Offset) [°C]']
 
@@ -237,6 +251,8 @@ def area_calc(peak_dframe, measurement_dframe, series_name):
 
     peak_dframe.loc[peak_dframe["Series"] == series_name, "dH_melt [mJ]"] = areas
     peak_dframe.loc[peak_dframe["Series"] == series_name, "Duration [sec]"] = durations
+
+    # measurement_dframe.drop('Time [sec]', axis=1, inplace=True)
 
     return True
 

@@ -60,6 +60,12 @@ def download_excel(project_id, attribute, filename):
     file_path = str(os.path.join(app.config['UPLOAD_FOLDER'], attr_value))
     df = pd.read_csv(file_path, sep=';')
 
+    if attribute == "peaks_csv":
+        df[['Sample', 'Segment']] = df['Series'].str.split('_', expand=True)
+        column_order = (['File', 'Series', 'Sample', 'Segment']
+                        + [col for col in df.columns if col not in ['File', 'Series', 'Sample', 'Segment']])
+        df = df[column_order]
+
     if sample and segment:
         series = sample + '_S' + segment
         print(series)
@@ -68,7 +74,6 @@ def download_excel(project_id, attribute, filename):
             df = df[df["Series"] == series]
         elif attribute == "measurements_csv":
             df = df[[series]]
-            
     sheet_name = str(attribute).split('_')[0]
 
     output = BytesIO()

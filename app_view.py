@@ -48,6 +48,9 @@ def sample_segment_view(project_id, sample, segment):
                 abort(404)
             print(project.peaks_csv)
 
+            info_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.info_csv))
+            df_info = pd.read_csv(info_csv_path, sep=";")
+
             peaks_csv_file_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.peaks_csv))
             df_peak_all = pd.read_csv(peaks_csv_file_path, sep=';')
 
@@ -93,7 +96,7 @@ def sample_segment_view(project_id, sample, segment):
                                 df_peak['T1 (Onset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
                             df_peak['T2 (Offset) [°C]'] = (
                                 df_peak['T2 (Offset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
-                            area_calc(df_peak, df_measurement,
+                            area_calc(df_peak, df_measurement, df_info,
                                       series)  # anhand der neuen Punkte werden die Flächen berechnet
                         elif request.form.get("action") == "table_delete":
                             df_peak.reset_index(drop=True, inplace=True)
@@ -112,7 +115,7 @@ def sample_segment_view(project_id, sample, segment):
                                                                      this_height=0, this_prominence=0.01,
                                                                      start=min_temperature, end=max_temperature)
 
-                            peak_df_area_calc(df_peak_new, df_measurement)
+                            peak_df_area_calc(df_peak_new, df_measurement, df_info)
                             df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
 
                         update_peaks_csv(df_peak_all, df_peak, project, series)

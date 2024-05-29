@@ -111,7 +111,11 @@ def project_overview(project_id):
                     df_peak = get_peak_df(df_measurement)
 
                 # Berechnung der Peak-Flächen
-                peak_df_area_calc(df_peak, df_measurement)
+                info_csv_path = str(os.path.join(current_app.config['UPLOAD_FOLDER'], project.info_csv))
+                df_info = pd.read_csv(info_csv_path, sep=";")
+                print(df_info)
+
+                peak_df_area_calc(df_peak, df_measurement, df_info)
 
                 # Speichern
                 peaks_csv_name = f"p{project.id}_peaks.csv"
