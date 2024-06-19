@@ -81,16 +81,15 @@ def sample_segment_view(project_id, sample, segment):
             json_peak = df_peak.to_json(orient="index", indent=4)
 
             if request.method == 'POST':
-                jsonPeak_string = request.form.get('jsonPeak')
-                df_peak = pd.read_json(StringIO(jsonPeak_string), orient="index")
+                if request.form.get("action"):
+                    jsonPeak_string = request.form.get('jsonPeak')
+                    df_peak = pd.read_json(StringIO(jsonPeak_string), orient="index")
 
-                onset_plausible = (df_peak['T1 (Onset) [°C]'] < df_peak['T_melt [°C]']).all()
-                offset_plausible = (df_peak['T2 (Offset) [°C]'] > df_peak['T_melt [°C]']).all()
+                    if request.form.get("action") == "plot_edit":  # die Punkte wurden verändert
+                        onset_plausible = (df_peak['T1 (Onset) [°C]'] < df_peak['T_melt [°C]']).all()
+                        offset_plausible = (df_peak['T2 (Offset) [°C]'] > df_peak['T_melt [°C]']).all()
 
-                if onset_plausible and offset_plausible:
-
-                    if request.form.get("action"):
-                        if request.form.get("action") == "plot_edit":  # die Punkte wurden verändert
+                        if onset_plausible and offset_plausible:
                             # Neue Punkte zuweisen und neue Flächen berechnen
                             df_peak['T1 (Onset) [°C]'] = (
                                 df_peak['T1 (Onset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
@@ -98,29 +97,38 @@ def sample_segment_view(project_id, sample, segment):
                                 df_peak['T2 (Offset) [°C]'].apply(lambda x: get_nearest_value(x, temperature_list)))
                             area_calc(df_peak, df_measurement, df_info,
                                       series)  # anhand der neuen Punkte werden die Flächen berechnet
-                        elif request.form.get("action") == "table_delete":
-                            df_peak.reset_index(drop=True, inplace=True)
-                            df_peak.index += 1
 
-                        elif request.form.get("action") == "table_add":
-                            min_temperature = float(request.form.get("min_temperature")) if request.form.get(
-                                "min_temperature") else 0
-                            max_temperature = float(request.form.get("max_temperature")) if request.form.get(
-                                "max_temperature") else 300
+                            update_peaks_csv(df_peak_all, df_peak, project, series)
+                            json_peak = df_peak.to_json(orient="index", indent=4)
 
-                            min_temperature = get_nearest_value(min_temperature, temperature_list)
-                            max_temperature = get_nearest_value(max_temperature, temperature_list)
-
-                            df_peak_new = get_peak_df_for_searcharea(df_measurement.loc[:, [series]],
-                                                                     this_height=0, this_prominence=0.01,
-                                                                     start=min_temperature, end=max_temperature)
-
-                            peak_df_area_calc(df_peak_new, df_measurement, df_info)
-                            df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
+                    elif request.form.get("action") == "table_delete":
+                        jsonPeak_string = request.form.get('jsonPeak')
+                        df_peak = pd.read_json(StringIO(jsonPeak_string), orient="index")
+                        df_peak.reset_index(drop=True, inplace=True)
+                        df_peak.index += 1
 
                         update_peaks_csv(df_peak_all, df_peak, project, series)
+                        json_peak = df_peak.to_json(orient="index", indent=4)
 
-                    json_peak = df_peak.to_json(orient="index", indent=4)
+                    elif request.form.get("action") == "table_add":
+                        min_temperature = float(request.form.get("min_temperature")) if request.form.get(
+                            "min_temperature") else 0
+                        max_temperature = float(request.form.get("max_temperature")) if request.form.get(
+                            "max_temperature") else 300
+
+                        min_temperature = get_nearest_value(min_temperature, temperature_list)
+                        max_temperature = get_nearest_value(max_temperature, temperature_list)
+
+                        df_peak_new = get_peak_df_for_searcharea(df_measurement.loc[:, [series]],
+                                                                 this_height=0, this_prominence=0.01,
+                                                                 start=min_temperature, end=max_temperature)
+
+                        peak_df_area_calc(df_peak_new, df_measurement, df_info)
+                        df_peak = add_new_peaks_to_df(df_peak, df_peak_new)
+
+                        update_peaks_csv(df_peak_all, df_peak, project, series)
+                        json_peak = df_peak.to_json(orient="index", indent=4)
+
 
             context["project_id"] = project_id
             context["sample"] = sample
@@ -137,8 +145,8 @@ def sample_segment_view(project_id, sample, segment):
 
 def add_new_peaks_to_df(old_df, new_df):
     old_df = pd.concat([old_df, new_df], ignore_index=True)
-    old_df.drop_duplicates(subset=['Peak_Temperature'], keep='first', inplace=True)
-    old_df.sort_values(by=['Peak_Temperature'], inplace=True)
+    old_df.drop_duplicates(subset=['T_melt [°C]'], keep='first', inplace=True)
+    old_df.sort_values(by=['T_melt [°C]'], inplace=True)
     old_df.reset_index(drop=True, inplace=True)
     old_df.index += 1
     return old_df
